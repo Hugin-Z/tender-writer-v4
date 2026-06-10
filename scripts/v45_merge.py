@@ -19,7 +19,6 @@ from __future__ import annotations
 import argparse
 import json
 import re
-import shutil
 import sys
 from pathlib import Path
 
@@ -82,10 +81,10 @@ def build_merge_order(brief: dict) -> list[tuple[int | None, str, str]]:
             elif sub == 'C-template':
                 order.append((i, 'c_template', name))
             elif sub == 'C-attachment':
-                # V4-4: 入 merge_order, 主循环不 composer.append (不进 final_response.docx),
-                # 改为拷贝附件到 final_tender_package/attachments/<part_name>/ +
-                # ops_checklist 加附件说明段 (同 C-reference 不进主文件同型)
-                order.append((i, 'c_attachment', name))
+                # #N20 挂档类型,按 SKILL.md 不进 v1.1
+                print(f"[信息] Part[{i}] '{name}' sub_mode=C-attachment,"
+                      "合并器跳过(#N20 挂档)", file=sys.stderr)
+                continue
             else:
                 print(f"[警告] Part[{i}] '{name}' production_mode=C 但 sub_mode 未识别:"
                       f"{sub!r},合并器跳过", file=sys.stderr)
@@ -151,42 +150,6 @@ def _create_part_divider(tmp_dir: Path, title: str) -> Path:
     out = tmp_dir / f"_divider_{title.replace('/', '_')[:20]}.docx"
     doc.save(str(out))
     return out
-
-
-def _render_c_attachment_section(part: dict, manifest: dict) -> str:
-    """V4-4 C-attachment: 读 attachments.yaml manifest, 提炼为 ops_checklist 段落。
-    显式列附件清单(resolved + pending_user), pending_user 项明确标"待人工放置"。
-    参照 _render_c_reference_section 同型结构。
-    """
-    entries = manifest.get('attachments', []) or []
-    lines = [f"## {part.get('name', '<no name>')} (附件)"]
-    lines.append('')
-    lines.append(f"**附件总数**: {len(entries)}")
-    lines.append('')
-    resolved = [a for a in entries if a.get('status') == 'resolved']
-    pending = [a for a in entries if a.get('status') == 'pending_user']
-    if resolved:
-        lines.append(f"**已就位附件 ({len(resolved)})**:")
-        for a in resolved:
-            lines.append(
-                f"- {a.get('target_filename')} "
-                f"(asset: {a.get('asset_type')} / {a.get('asset_name')}, "
-                f"company: {a.get('company_id')})"
-            )
-        lines.append('')
-    if pending:
-        lines.append(f"**待人工放置 ({len(pending)})**:")
-        for a in pending:
-            lines.append(
-                f"- {a.get('target_filename')} "
-                f"(asset: {a.get('asset_type')} / {a.get('asset_name')}, "
-                f"company: {a.get('company_id')}, "
-                f"source_path={a.get('source_path')})"
-            )
-        lines.append('')
-    lines.append('---')
-    lines.append('')
-    return '\n'.join(lines)
 
 
 def _render_c_reference_section(part: dict, instructions_path: Path) -> str:
@@ -293,9 +256,6 @@ def _main_body(args, project_dir):
     print(f"[信息] 动态生成合并顺序(共 {len(merge_order)} 项,"
           f"来源:tender_brief.response_file_parts)", file=sys.stderr)
     c_ref_written = 0
-    c_attach_written = 0
-    c_attach_copied = 0
-    c_attach_pending = 0
     for part_idx, kind, title in merge_order:
         part = _get_part(brief, part_idx)
         part_name = part.get('name') if part else title
@@ -319,41 +279,6 @@ def _main_body(args, project_dir):
             operations_lines.append('')
             c_ref_written += 1
             print(f"[信息] {title} → operations_checklist.md(不进 final_response.docx)")
-
-        elif kind == 'c_attachment':
-            # V4-4: 不进 final_response.docx,而是把 fill 阶段产出的附件副本
-            # 拷贝到 final_tender_package/attachments/<part_name>/,并把附件清单
-            # 渲染到 operations_checklist.md(同 c_reference 不进主文件同型)
-            attachments_yaml = output_dir / 'c_mode' / part_dir_name / 'attachments.yaml'
-            if not attachments_yaml.exists():
-                print(f"[警告] C-attachment attachments.yaml 缺失: {attachments_yaml}",
-                      file=sys.stderr)
-                continue
-            with open(attachments_yaml, 'r', encoding='utf-8') as f:
-                manifest = yaml.safe_load(f) or {}
-            # 拷贝 attachments 子目录下文件到 final_tender_package/attachments/<part_name>/
-            src_attach_dir = output_dir / 'c_mode' / part_dir_name / 'attachments'
-            dst_attach_dir = pkg_dir / 'attachments' / part_dir_name
-            dst_attach_dir.mkdir(parents=True, exist_ok=True)
-            entries = manifest.get('attachments', []) or []
-            for a in entries:
-                if a.get('status') != 'resolved':
-                    c_attach_pending += 1
-                    continue
-                src_file = src_attach_dir / a.get('target_filename', '')
-                if not src_file.exists():
-                    print(f"[警告] C-attachment fill 产物缺失: {src_file}",
-                          file=sys.stderr)
-                    c_attach_pending += 1
-                    continue
-                shutil.copy2(src_file, dst_attach_dir / a.get('target_filename'))
-                c_attach_copied += 1
-            section = _render_c_attachment_section(part, manifest)
-            operations_lines.append(section)
-            operations_lines.append('')
-            c_attach_written += 1
-            print(f"[信息] {title} → attachments/{part_dir_name}/ + "
-                  f"operations_checklist.md(不进 final_response.docx)")
 
         elif kind == 'b_mode':
             src = output_dir / 'b_mode' / part_dir_name / 'assembled.docx'
@@ -442,10 +367,6 @@ def _main_body(args, project_dir):
     # v3.0.2: 区分声明数 vs 实际写入数,缺失能立即识别
     c_ref_declared = sum(1 for _, kind, _ in merge_order if kind == 'c_reference')
     print(f"  C-reference: {c_ref_written}/{c_ref_declared}(成功写入/声明数量)")
-    # V4-4: C-attachment 统计 — 写入 Part 数 / 已拷贝附件数 / 待人工放置附件数
-    c_attach_declared = sum(1 for _, kind, _ in merge_order if kind == 'c_attachment')
-    print(f"  C-attachment: {c_attach_written}/{c_attach_declared}(Part 写入/声明) "
-          f"附件 {c_attach_copied} 已拷贝 / {c_attach_pending} 待人工放置")
     print(f"  待人工填充:   {len(pending_entries)}(见 pending_manual_work.md)")
     print("=" * 60)
 

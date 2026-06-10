@@ -1,2 +1,0 @@
-[test fixture] sample attachment content for V4-4 C-attachment e2e test
-营业执照扫描件占位文本(测试用,非真实公司材料)

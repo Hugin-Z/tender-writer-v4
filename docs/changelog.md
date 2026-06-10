@@ -1,38 +1,5 @@
 # tender-writer 变更日志
 
-## V4-2 · 2026-05-29 B 智能匹配·V4-2a 链路打通
-
-V4-2(B 智能匹配)拆为 V4-2a(链路打通)+ V4-2b(元数据精化 + rationale)。本次完成 V4-2a:让 AI 在 B 模式 extract 阶段写 intermediate.json 时 awareness 库内候选 + 本 Part 关联评分项,据三件源选材,消除此前"库空仍盲写 asset_query"的行为。
-
-- 机制(裁定甲):脚本扫候选 + AI 选。新增 `CuratedLocalAssetsProvider.enumerate_inventory()` 扫 assets 文件系统产候选清单(仅 `category` / `company_id` / `filename` / `year`,不读 frontmatter);`b_mode_extract.cmd_extract_text` 产两个 sidecar(`scoring_matrix_excerpt.md` 本 Part 评分项关键词 + 证据材料 / `assets_inventory.json` 候选清单);`SKILL.md` 阶段 4-B 加 Step 3 选材约束,要求 AI 读三件源、`asset_query.inventory_match` 选真实候选。脚本只产候选清单,AI 做语义选择(沿 R10 + 决策 #5)。
-- 占位(裁定甲 / 复用 V4-4 范本):库内无匹配候选时 `inventory_match` 标占位(`__PENDING_USER__`),不盲写库内不存在的条目。字段定义在 `docs/manifest_schema.md`。
-- 边界:V4-2a 只扫文件系统可见信息,frontmatter 14 字段 0 消费;下游 `b_mode_fill` / `resolve` 已通,本次不动;设计意图是用户按目录结构丢文件进 `assets/` 即可用,零元数据负担。
-
-V4-2b 待做项登记(不在本次):`asset_query.rationale` 字段 + `selection_rationale` 产物(为什么选 / 可回查);frontmatter 元数据(`review_status` / 有效期 / 适用范围 / 颁证机构)参与匹配;`lookup_priority` 的 `name_match_first` + `review_status_first` 两档。
-
-R10 / PER 流程登记(本次 Phase 3 发现,非 V4-2a 引入):
-
-- `r10_consistency_check` 报 `plans/v4-3.md:28`(指向 handbook 未建的 `ISC.md`)与 `plans/v4-4.md:24`(描述 fixture 改名前的 FROM 名)2 处路径引用为违规。经判定二者均为 false positive 非真违规:plan 作为过程文档正确描述「指向未来文件」「改名来源」,路径不存在是预期且正确的。V4-2a 守 scope 不修(不加 allowlist 不动 plan)。
-- 待办 1:扫描器应以规则识别 `plans/` 内「未来文件 / 改名来源」类路径引用(合法 lookalike),而非逐条 allowlist;沿 V4-0.2「能规则识别的用规则、真个案才 allowlist」原则。
-- 待办 2:R10 scan 纳入 PER Phase 3 自检标准动作(V4-0 建了 `r10_consistency_check` 但未进 Phase 3 三件,V4-3/V4-4 Phase 3 均未跑、V4-4 已确认是疏漏);以后 Phase 3 自检含「跑 R10 scan + 基线持平或解释新增」。
-
-本次零下游改动(`b_mode_fill` / `resolve` 未碰)、零 frontmatter 消费、零其他 sub_mode 影响;14/14 测试 PASS(含 V4-2a 6 新 case)。
-
----
-
-## V4-4 · 2026-05-29 C-attachment 真实现
-
-C-attachment(扫描件附件,整份文件单独挂,不进主响应文件文本流)从挂档状态真实现:schema 层原已收值,本次把 migrate / extract / fill / merge / export 五个执行端的 NotImplementedError / skip 改为真实业务分支,端到端跑通。
-
-- 边界:与 B 模式区分明确 —— B 模式素材内容融进 assembled.docx 文本流,C-attachment 整份文件作为独立附件单独挂,不进任何文本流。附件源复用本仓库 assets(CuratedLocalAssetsProvider 同型),不接外部源。
-- 占位策略:附件源文件缺失时产占位(`__PENDING_USER__`)不硬失败(部分附件本就需用户人工放置);占位状态显式可见 —— attachments 清单标占位 + operations_checklist 列出待人工放置项 + export 透传,不静默产空附件。
-- 测试:原 `case_5` / `ok_skip_cattach` 的"验整项跳过"断言改造为真行为断言(入 `merge_order` + `attachments` 产出 + `ops_checklist` 附件段 + 占位路径);fixture 去 `_skip` 后缀对齐真实现语义;新增 e2e case 覆盖 extract→fill→merge→export 全链路含占位条目。
-- 候选项登记(不在 V4-4 范围):招标文件「投标文件构成与装订」要求的结构化抽取 + 下游消费 —— 当前 parse_tender 仅以 section_anchors 标位置、未抽内容、无结构化字段、无下游消费,demo 实测该段全部【待补充】。附件目录布局现采用工具自定默认(`attachments/<part>/`),未消费招标文件装订要求。此项留 V4 后期评估。
-
-本次零 schema 层改动(C-attachment 在 brief_schema 已完整)、零 C-template/C-reference/A/B 模式现有逻辑改动;新增业务分支均参照同型 sub_mode 实现。
-
----
-
 ## V4-3 · 2026-05-29 C-reference 诚实化收尾
 
 V4-3 经两轮 Phase 0 实测确认 C-reference 决策层已在 fixture 层验证(brief 解析 / v45_merge 分流 / export 映射三处纯函数断言),范围收敛为诚实化收尾,非功能实现。

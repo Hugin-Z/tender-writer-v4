@@ -332,107 +332,6 @@ def _build_instructions_md(part: dict, part_index: int, data: dict, out_dir: Pat
     print("=" * 60)
 
 
-def _build_attachments_yaml(part: dict, part_index: int, data: dict,
-                            out_dir: Path) -> None:
-    """V4-4 C-attachment: 渲染 attachments.yaml (附件清单 + 源文件状态)。
-
-    intermediate.json 结构(C-attachment 用):
-        {
-          "part_name": "...",
-          "sub_mode": "C-attachment",
-          "source_anchor": {...},
-          "attachments": [
-            {
-              "company_id": "...",            # 投标主体 (跟 companies.yaml 对齐)
-              "asset_type": "...",            # 资质 / 业绩 / 简历 等
-              "asset_name": "...",            # 营业执照 / 项目案例 X 等具体名
-              "source_path": "..." | "__PENDING_USER__",  # 仓内 assets/ 相对路径或占位
-              "target_filename": "..."        # 投标包内目标文件名
-            }
-          ]
-        }
-
-    输出 attachments.yaml 同结构 + 每条加 status (resolved / pending_user)。
-    extract 只产清单, 不拷贝文件(拷贝在 fill 阶段)。源文件不存在或显式占位 → status=pending_user。
-
-    复用 __PENDING_USER__ 字面 (与 companies.yaml / c_mode_fill 同, 不另造)。
-    """
-    fm_part_name = data.get('part_name')
-    fm_sub_mode = data.get('sub_mode')
-    fm_source_anchor = data.get('source_anchor')
-    attachments = data.get('attachments')
-
-    if not fm_part_name or not fm_sub_mode or fm_source_anchor is None:
-        print(f"[错误] C-attachment intermediate.json 缺少必填字段 "
-              f"(part_name / sub_mode / source_anchor)", file=sys.stderr)
-        sys.exit(1)
-    if fm_sub_mode != 'C-attachment':
-        print(f"[错误] intermediate.json sub_mode='{fm_sub_mode}',"
-              f"应为 'C-attachment'", file=sys.stderr)
-        sys.exit(1)
-    if not isinstance(attachments, list) or not attachments:
-        print(f"[错误] C-attachment intermediate.json attachments 字段为空或非列表",
-              file=sys.stderr)
-        sys.exit(1)
-
-    PENDING_USER = '__PENDING_USER__'
-    entries = []
-    resolved_count = 0
-    pending_count = 0
-    for i, a in enumerate(attachments):
-        required = ('company_id', 'asset_type', 'asset_name', 'source_path',
-                    'target_filename')
-        for key in required:
-            if key not in a:
-                print(f"[错误] attachments[{i}] 缺少必填字段 '{key}'",
-                      file=sys.stderr)
-                sys.exit(1)
-        source_path = a['source_path']
-        # 显式占位 或 仓内文件不存在 → pending_user; 否则 resolved
-        if source_path == PENDING_USER:
-            status = 'pending_user'
-            pending_count += 1
-        else:
-            # source_path 相对仓根解析 (绝对路径直接用)
-            abs_source = (ROOT / source_path) \
-                if not Path(source_path).is_absolute() else Path(source_path)
-            if abs_source.exists():
-                status = 'resolved'
-                resolved_count += 1
-            else:
-                status = 'pending_user'
-                pending_count += 1
-        entries.append({
-            'company_id': a['company_id'],
-            'asset_type': a['asset_type'],
-            'asset_name': a['asset_name'],
-            'source_path': source_path,
-            'target_filename': a['target_filename'],
-            'status': status,
-        })
-
-    manifest = {
-        'part_name': fm_part_name,
-        'sub_mode': 'C-attachment',
-        'source_anchor': fm_source_anchor,
-        'attachments': entries,
-    }
-    out_dir.mkdir(parents=True, exist_ok=True)
-    out_path = out_dir / 'attachments.yaml'
-    with open(out_path, 'w', encoding='utf-8') as f:
-        yaml.safe_dump(manifest, f, allow_unicode=True, sort_keys=False)
-
-    print(f"[完成] Part[{part_index}] '{part['name']}' (C-attachment)")
-    print(f"  attachments.yaml: {out_path}")
-    print(f"  附件总数: {len(entries)} (resolved {resolved_count} / "
-          f"pending_user {pending_count})")
-    print()
-    print("=" * 60)
-    print("下一步: 用户 review attachments.yaml, 确认无误。pending_user 条目")
-    print("需用户手动把附件文件放到 source_path 指向位置后, 跑 c_mode_fill 拷贝。")
-    print("=" * 60)
-
-
 def cmd_build_from_json(args, project_dir: Path):
     # V60: sub_mode 分流
     from brief_schema import resolve_sub_mode
@@ -440,6 +339,12 @@ def cmd_build_from_json(args, project_dir: Path):
     brief = load_brief(project_dir)
     part = get_c_part(brief, args.part)
     sub_mode = resolve_sub_mode(part)
+
+    if sub_mode == 'C-attachment':
+        raise NotImplementedError(
+            f"Part[{args.part}] '{part['name']}' sub_mode=C-attachment 当前挂档,"
+            f"见 business_model §8 #N20"
+        )
 
     part_dir_name = _safe_name(part['name'])
     out_dir = project_dir / 'output' / 'c_mode' / part_dir_name
@@ -455,12 +360,6 @@ def cmd_build_from_json(args, project_dir: Path):
         # C-reference: intermediate.json 携带 instructions.md 内容信息
         # 直接将其渲染为 instructions.md(YAML front matter + markdown 正文)
         _build_instructions_md(part, args.part, data, out_dir)
-        return
-
-    if sub_mode == 'C-attachment':
-        # V4-4 C-attachment: intermediate.json 携带附件清单
-        # 渲染 attachments.yaml (清单 + 源文件状态), 不拷贝文件(拷贝在 fill)
-        _build_attachments_yaml(part, args.part, data, out_dir)
         return
 
     # 以下为 C-template 路径(默认)

@@ -23,7 +23,6 @@ from __future__ import annotations
 import argparse
 import json
 import re
-import shutil
 import sys
 from pathlib import Path
 
@@ -321,54 +320,10 @@ def main():
     sub_mode = resolve_sub_mode(parts[args.part])
 
     if sub_mode == 'C-attachment':
-        # V4-4: 读 extract 产出的 attachments.yaml, 逐条校验源文件 → 拷贝到
-        # c_dir/attachments/<target_filename>; 缺失项标 pending_user 不报错
-        # 不产空文件。参照 C-reference 校验分支结构 + C-template 产物拷贝结构。
-        attachments_yaml = c_dir / 'attachments.yaml'
-        if not attachments_yaml.exists():
-            print(f"[错误] 找不到 attachments.yaml: {attachments_yaml}",
-                  file=sys.stderr)
-            print(f"  请先跑 c_mode_extract.py 产出附件清单", file=sys.stderr)
-            sys.exit(1)
-        with open(attachments_yaml, 'r', encoding='utf-8') as f:
-            manifest = yaml.safe_load(f)
-        entries = manifest.get('attachments', []) or []
-        attachments_dir = c_dir / 'attachments'
-        attachments_dir.mkdir(parents=True, exist_ok=True)
-        copied = 0
-        pending = []
-        updated_entries = []
-        for a in entries:
-            source_path = a.get('source_path')
-            target_filename = a.get('target_filename')
-            # 重新判定 status (extract 后用户可能补全过附件文件)
-            if source_path == PENDING_USER:
-                status = 'pending_user'
-                pending.append(a)
-            else:
-                abs_source = (ROOT / source_path) \
-                    if not Path(source_path).is_absolute() else Path(source_path)
-                if abs_source.exists():
-                    dst = attachments_dir / target_filename
-                    shutil.copy2(abs_source, dst)
-                    copied += 1
-                    status = 'resolved'
-                else:
-                    status = 'pending_user'
-                    pending.append(a)
-            updated_entries.append({**a, 'status': status})
-        # 回写 attachments.yaml (status 字段反映 fill 时点的真实状态)
-        manifest['attachments'] = updated_entries
-        with open(attachments_yaml, 'w', encoding='utf-8') as f:
-            yaml.safe_dump(manifest, f, allow_unicode=True, sort_keys=False)
-        print(f"[信息] Part[{args.part}] '{part_name}' (C-attachment) 处理完毕")
-        print(f"  附件目录: {attachments_dir}")
-        print(f"  已拷贝: {copied} / 待人工放置 (pending_user): {len(pending)}")
-        if pending:
-            print(f"  待人工放置清单:")
-            for a in pending:
-                print(f"    - {a.get('asset_name')} (source_path={a.get('source_path')})")
-        return
+        raise NotImplementedError(
+            f"Part[{args.part}] '{part_name}' sub_mode=C-attachment 当前挂档,"
+            f"见 business_model §8 #N20"
+        )
 
     if sub_mode == 'C-reference':
         # C-reference: 无 fill 动作, 仅校验 instructions.md 存在
