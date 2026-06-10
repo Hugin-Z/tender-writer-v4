@@ -1,5 +1,23 @@
 # tender-writer 变更日志
 
+## V4-skel · 2026-06 · 三待办结构层补全(占位喊话地图)
+
+把 V4 剩余三待办(V4-2b / V4-1b / V4-7)做到结构层 —— 字段、接口、调用链、占位接住,让完整跑一次能全程不断流;实现层留待真实输入暴露后再修。**核心交付不是代码骨架本身,而是一张"哪里真 / 哪里占位"的地图**:每个占位都自己喊出"我是占位、实线未做、看某 sidecar",完整跑时铺成产物里的占位标记,Hugin 据此一次性定三待办的实线该怎么填。
+
+- **V4-2b 结构层(C1-C3)**:`enumerate_inventory()` 每条候选加 4 个 frontmatter 字段(`review_status` / `valid_until` / `issuer` / `applicable_scope`)值留 `None` 不读、CLI 喊"未消费值 None";`asset_query.rationale` 字段定义 + 未填透传并喊话 + `selection_rationale.json` sidecar schema;`lookup_priority` 非默认档(`name_match_first` / `review_status_first`)命中时 fallback `latest_year_first` 并 emit 警告(把"选了没生效"从静默变显式)。实现层(frontmatter 解析 / rationale 详略 / 多档判据)留待真实投标手感驱动。
+
+- **V4-1b 结构层(C4-C6)**:含图段落只读检测(不碰 `<w:drawing>` 剥离) → 整段跳过 → 原位插可见占位段「此处缺 N 张证书图,投标前人工放入原件」+ 产 `missing_elements.yaml`(含图段计数 / 表内含图粗粒度 / sections 数)。**R10 红线**:不静默丢图,Hugin WPS 打开产物看得见缺图位置。实现层(图片 OXML 拷贝 + media part 复制 + relationship 注册)留待真实含图 anchor + 人工目检,与 V4-1a 表格保真同类深度。公章红线不变(签章是用户法律动作,工具不代生成)。
+
+- **V4-7 结构层(C7-C9)**:`v45_merge` 在 `composer.append` 后、`composer.save` 前接入 `_post_merge_normalize` hook(当前 noop)+ 产 `merge_normalize.log` 记录四维协调状态(`font` / `table_width` / `section` / `page_number` 全 `"noop"` 字符串)。实现层(cross-doc 协调规则)留待真实多 Part 合并的视觉冲突驱动,深度与 V4-1a 同类。
+
+- **验证**(沿 V4-1a "验生效不验存在"教训):`test_v4_skeleton_e2e.py` 8 case 验占位喊话**真的喊出来了**(stderr 喊话行 / 产物可见占位段 / sidecar `"noop"` 字面),不只验"字段加了"。完整跑全程不断流。
+
+- **R10**:V4-skel 任务性质(大量 plan 落盘 + stderr 喊话)必然涌入 plan-style lookalike(未来文件 / 符号引用 / 示例路径 / 历史 plan / gitignored)。13 处逐条登记进 `r10_allowlist.yaml`(各带性质说明),基线语义保持"allowlist 外零违规"(仍是干净的回归探针,不放宽基线数字)。此 allowlist 是过渡桥,根治见 `docs/v4_backlog.md` 候选项 #2(扫描器规则识别 plans/ lookalike),届时应被规则替代移除。
+
+- **静态占位点清单**见 `plans/v4-structure-completion.md` §4.5(不另立单独文件,Hugin Phase 1 裁定);完整跑产出的运行时地图 `final_tender_package/v4_placeholders_map.md` 不入仓(运行时产物)。
+
+---
+
 ## V4-1 · 2026-05-29 B asset 表格 + 段落样式保真·V4-1a
 
 V4-1(B asset 完整保真)拆为 V4-1a(段落 OXML + 表格)+ V4-1b(图片/页眉页脚,押后)。本次完成 V4-1a:B 模式 asset 注入 assembled.docx 由「仅提取段落文本(`add_run(para.text)`)」升级为「OXML element 拷贝 + 跨 part ref name-based rebind」,表格 / 段落样式 / 字体保真。

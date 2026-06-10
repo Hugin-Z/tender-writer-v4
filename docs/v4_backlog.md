@@ -13,26 +13,31 @@
 
 ### V4-1b · B asset 图片 / 页眉页脚 / 扫描件保真
 
-**卡在**: V4-1a 押后,等真实需求触发(demo 当前 anchor `assets/公司资质/own_demo/_raw/1.docx` 不含图片,缺真实样本)
-**范围**: 图片 / `<w:drawing>` / inline_shape 注入(media part 复制 + relationship 注册)、页眉页脚 / section 保真、扫描件保真(待定)
-**字面源**: `docs/changelog.md` V4-1 entry 内 "V4-1b 待做项登记" bullet
-**前置**: Hugin 提供含图片 / 公章扫描件 / 页眉页脚的脱敏真实 anchor (类似 V4-1a 收的 `assets/公司资质/own_demo/_raw/1.docx`)。**没真实样本不能开工**(V4-1a 13 commit 教训:docx 深度保真假设→撞→修成本高,必须 fixture-first)
+**状态**: **结构层已补(V4-skel,2026-06)** — 含图段落只读检测 + 整段跳过 + 原位插可见占位段「此处缺 N 张证书图,投标前人工放入原件」+ 产 `missing_elements.yaml`(R10 红线:不静默丢图)。实现层(图片 OXML 拷贝 + media part 复制 + relationship 注册)**待真实含图 anchor + 人工目检驱动**。
+**卡在**: 实线图片保真等真实需求触发(demo 当前 anchor `assets/公司资质/own_demo/_raw/1.docx` 不含图片,缺真实样本)
+**范围**(实现层): 图片 / `<w:drawing>` / inline_shape 注入(media part 复制 + relationship 注册)、页眉页脚 / section 保真、扫描件保真(待定)
+**字面源**: `docs/changelog.md` V4-skel entry V4-1b bullet + V4-1 entry "V4-1b 待做项登记" bullet
+**前置**: Hugin 提供含图片 / 公章扫描件 / 页眉页脚的脱敏真实 anchor。**没真实样本不能开工实现层**(V4-1a 13 commit 教训:docx 深度保真假设→撞→修成本高,必须 fixture-first)
 
 ### V4-2b · B 模式元数据精化 + rationale
 
+**状态**: **结构层已补(V4-skel,2026-06)** — `enumerate_inventory()` 加 4 frontmatter 字段(值 None)+ CLI 喊"未消费";`asset_query.rationale` 字段定义 + 未填透传并喊话 + `selection_rationale.json` sidecar schema;`lookup_priority` 非默认档 fallback 并 emit 警告。实现层(frontmatter 解析 / rationale 详略 / 多档判据)**待真实投标手感驱动**。
 **卡在**: Hugin 拿 V4-2a (`asset_query.inventory_match` 链路) 跑真实投标有手感后,才拍 3 个设计裁定
-**范围**:
-- `asset_query.rationale` 字段 + `selection_rationale` 产物(为什么选 / 可回查)
-- frontmatter 元数据(`review_status` / 有效期 / 适用范围 / 颁证机构)参与匹配
-- `lookup_priority` 的 `name_match_first` + `review_status_first` 两档(`docs/manifest_schema.md` 内已注 V4 占位)
-**字面源**: `docs/changelog.md` V4-2 entry 内 "V4-2b 待做项登记" bullet
+**范围**(实现层):
+
+- `asset_query.rationale` 详略 + `selection_rationale.json` 内容填(为什么选 / 可回查)
+- frontmatter 元数据(`review_status` / 有效期 / 适用范围 / 颁证机构)实际读取 + 参与匹配
+- `lookup_priority` 的 `name_match_first` + `review_status_first` 两档真实判据(当前 fallback `latest_year_first` + emit warning)
+
+**字面源**: `docs/changelog.md` V4-skel entry V4-2b bullet + V4-2 entry "V4-2b 待做项登记" bullet
 **前置**: Hugin 拿 V4-2a 跑真实项目 → 确定 frontmatter 哪些字段值钱 / rationale 写多详 / 多档 lookup_priority 的判据是什么。**没真实手感前定的裁定可能像 V4-1a.10 那样走错**
 
 ### V4-7 · V45 合并器格式协调(多 Part 合并的字体 / 表格 / 页码 / 图片一致)
 
+**状态**: **结构层已补(V4-skel,2026-06)** — `v45_merge` 在 `composer.append` 后、`composer.save` 前接入 `_post_merge_normalize` hook(当前 noop)+ 产 `merge_normalize.log` 记录四维协调状态(全 `"noop"` 字符串)。实现层(cross-doc 协调规则)**待真实多 Part 合并的视觉冲突驱动**,深度与 V4-1a 同类。
 **卡在**: Hugin 重新掂量投入产出后才定要不要做 / 做到什么保真度
-**范围**: cross-doc 表格列宽统一 / section break 收敛(全局单 section 或 section restart numbering 显式控制)/ 段前段后规整 fragment pass / 跨 part 字体一致
-**字面源**: V4-1a 收口时 Hugin 心里有数 — "docx 深度格式保真比 V4-1a 还深,假设→撞→修方式做大概率比这条线还长(13 commit / 6 轮 bug)"
+**范围**(实现层): cross-doc 表格列宽统一 / section break 收敛(全局单 section 或 section restart numbering 显式控制)/ 段前段后规整 fragment pass / 跨 part 字体一致
+**字面源**: `docs/changelog.md` V4-skel entry V4-7 bullet + V4-1a 收口时 Hugin 心里有数 — "docx 深度格式保真比 V4-1a 还深,假设→撞→修方式做大概率比这条线还长(13 commit / 6 轮 bug)"
 **前置**: Hugin 评估投入产出 — V4-7 跟 V4-0/2a/4 那种几轮就闭环的链路类活不同,**单 Part 注入字号一项就 4 个 commit (V4-1a.9/.10/.12/.13)**,V4-7 跨 Part 协调可能更深。值不值做 / 做多深由 Hugin 拍
 
 ---
@@ -81,6 +86,7 @@
 | 1 | **招标文件「投标文件构成与装订」要求结构化抽取 + 下游消费** | `docs/changelog.md` V4-4 entry 末"候选项登记" |
 | 2 | **R10 扫描器识别 plans/ 内"未来文件 / 改名来源"类路径引用**(合法 lookalike,目前手工 allowlist 2 处) | `docs/changelog.md` V4-2 entry 末"R10 待办 1" + V4-2a Phase 3 评审 |
 | 3 | **C-reference 执行端样例 entry**(`build_baseline.py:106-112` 注释明示推迟到 V4 完成后由真实场景驱动补) | `scripts/build_baseline.py` L106-112 注释 + V4-3 changelog |
+| 4 | **SKILL.md V45 整标合并器无独立流程节**(散在 L595 / L839 / L908 多处提及,V4-skel.9 把 V4-7 占位贴到 4-B L839 V45 现有备注块就近落,语义归属对但位置欠佳。将来 SKILL.md 整理时给合并器建独立"阶段 5.5: V45 整标合并"节,V4-skel 不动章节结构) | V4-skel.9 期 Hugin 实测发现 + Phase 1 裁定登记 |
 
 ---
 
@@ -93,6 +99,7 @@ V4 已落地的活,跨会话起手时不要重新做:
 - **V4-3**: C-reference 诚实化收尾(代码已端到端,demo 实测推迟由真实场景驱动)— 见 changelog
 - **V4-4**: C-attachment 真实现(5 处 raise/skip → 真分支 + e2e 跑通 + 占位 R10) — 见 changelog
 - **V4-1a**(13 commit / 6 轮 bug): B asset 表格 + 段落样式 + 字体 + 字号 + cell 字号 真修 — 见 changelog V4-1 entry
+- **V4-skel**(10 commit): V4-2b/V4-1b/V4-7 结构层补全 + 占位喊话地图 — 见 changelog V4-skel entry + plans/v4-structure-completion.md §4.5(静态占位点清单)
 
 ---
 
