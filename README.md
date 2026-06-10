@@ -1,12 +1,12 @@
-# tender-writer-v3
+# tender-writer-v4
 
 ![License](https://img.shields.io/badge/License-MIT-blue.svg) ![Python](https://img.shields.io/badge/Python-3.11%2B-blue) ![Platform](https://img.shields.io/badge/Platform-Windows-lightgrey) ![AI](https://img.shields.io/badge/AI-Claude%20Code%20%7C%20Cline-orange)
 
 ## 项目状态
 
-**稳定可用(主开发环境)** — v3.0.0 已封板,完成 14 项改进(V3-1 至 V3-14)。Linux / macOS 未验证。
+**稳定可用(主开发环境)** — 当前主线已推进到 V4-7a:V3 主流程已封板,V4 完成 B 模式保真、C-attachment、整标合并浅层规范化等增量。Linux / macOS 未验证。
 
-- **测试覆盖**: 12 个测试文件 / `./run_script.bat tests/run_all.py` 全 PASS
+- **测试覆盖**: 16 个测试文件 / `./run_script.bat tests/run_all.py` 全 PASS
 - **demo 项目**: `projects/demo_cadre_training/` 端到端可重跑(parse_tender → ... → export_deliverables 11 步)
 - **主开发环境**: Windows 10+ + Python 3.11,Linux/macOS 未验证
 - **维护状态**: 个人维护项目, issue / PR 响应可能不及时
@@ -21,8 +21,8 @@
 
 ```bash
 # 1. clone
-git clone https://github.com/Hugin-Z/tender-writer-v3.git
-cd tender-writer-v3
+git clone https://github.com/Hugin-Z/tender-writer-v4.git
+cd tender-writer-v4
 
 # 2. 装依赖(Windows 双击即可)
 install.bat
@@ -53,8 +53,10 @@ install.bat
 - **评分矩阵追踪**:10 列 CSV 把每一分拆到应答章节,杜绝漏答
 - **项目类型识别**:工程 / 平台 / 研究 / 规划 / 其他 5 类自动选 outline 模板
 - **docx 渲染质量**:统一中文宋体、黑色标题、图占位区块、字号相对规则、空格自动清理
-- **B 模式材料组装(表格 + 段落样式保真,V4-1a)**:asset 注入 assembled.docx 走 OXML element 拷贝,表格(含列宽)、段落级样式、字体、加粗保真;图片保真留 V4-1b;公章不做(签章是用户的法律动作,工具不代为生成,投标时用户自行处理公章页);扫描件保真待定。无命中时产占位 + `.pending_marker`,V45 合并器列入 `pending_manual_work.md`。**V4-skel V4-1b 结构层后**:含图段落整段跳过 + 原位插可见占位段 + 产 `missing_elements.yaml`(R10:不静默丢图,投标前据占位段与 sidecar 人工放入证书原件);实线图片保真留 V4-1b 实现层
+- **B 模式材料组装(表格 + 段落样式保真,V4-1a)**:asset 注入 assembled.docx 走 OXML element 拷贝,表格(含列宽)、段落级样式、字体、加粗保真;图片保真留 V4-1b 实现层,当前结构层会对含图段落插入可见占位并产 `missing_elements.yaml`;公章不做(签章是用户的法律动作,工具不代为生成,投标时用户自行处理公章页)。无命中时产占位 + `.pending_marker`,V45 合并器列入 `pending_manual_work.md`
 - **C 模式非交互填充**:一键跑完所有 C 模式 Part,变量缺失时 filled.docx 写入"【待填:变量描述】"显式占位
+- **C-attachment 附件挂载(V4-4)**:独立附件不并入主响应文件,由 `attachments.yaml` 记录源文件状态,V45 合并器拷贝附件并在操作清单中提示待人工放置项
+- **V45 整标合并(V4-7a)**:合并后接 master 规范做 style 层字体统一和表格 cell 字号统一;列宽、section、页码 reset 仍留 V4-7b 由真实多 Part 产物驱动
 - **跨章节一致性检查**:团队成本 vs 预算、承诺时间 vs 工期等自相矛盾类错误自动捕获
 - **Claude Code 深度协作契约**:CLAUDE.md 定义 6 条硬红线,AI 行为可预期
 
@@ -62,7 +64,15 @@ install.bat
 
 ## 版本演进
 
-**v3.0.0(当前)** — 在 v2.0.x 基础上完成 14 项改进(V3-1 至 V3-14):
+**V4-7a(当前)** — 在 v3.0.0 稳定主流程基础上继续补齐材料组装、附件挂载和整标合并质量:
+
+- **V4-1a**:B asset 表格、段落样式、字体、字号保真;图片/页眉页脚留 V4-1b 实现层,但结构层已可见占位不静默丢图
+- **V4-2a**:B 模式选材读取 `assets_inventory.json`,防止 AI 盲写库内不存在的素材
+- **V4-4**:C-attachment 从挂档变为真实业务分支,extract/fill/merge/export 端到端跑通
+- **V4-skel**:V4-1b / V4-2b / V4-7 的结构层和占位喊话地图落地
+- **V4-7a**:V45 合并器完成 style 层字体规范和表格 cell 字号规范;V4-7b 深度格式协调仍押后
+
+**v3.0.0** — 在 v2.0.x 基础上完成 14 项改进(V3-1 至 V3-14):
 
 - **测试覆盖**:从 1 个测试文件扩到 12 个文件,涵盖 parse_tender / build_scoring_matrix / generate_outline / b_mode / c_mode / compliance_check / check_chapter / check_cross_consistency 等核心模块
 - **B 模式真实组装**:CuratedLocalAssetsProvider 默认走 `assets/<类别>/<company_id>/_raw/` 真实命中,不再纯占位
@@ -102,6 +112,7 @@ install.bat
 | [SKILL.md](SKILL.md) | 五阶段主干 + 并列阶段工作流细节,AI 入口,必读 |
 | [CLAUDE.md](CLAUDE.md) | Claude Code 协作契约,6 条硬红线 |
 | [docs/DESIGN.md](docs/DESIGN.md) | 设计哲学 / 为什么这么设计 |
+| [docs/v4_backlog.md](docs/v4_backlog.md) | V4 剩余工作快照与已完成项边界 |
 | [docs/v3_planning.md](docs/v3_planning.md) | V3 改进路线图 + 完成判定(14 项) |
 | [docs/manifest_schema.md](docs/manifest_schema.md) | manifest.yaml 字段定义(B 模式 assembly_order schema) |
 | [docs/v2_design_notes.md](docs/v2_design_notes.md) | v2 设计决策记录 |

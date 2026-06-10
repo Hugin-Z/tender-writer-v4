@@ -62,19 +62,22 @@ def _append_placeholder_body(doc, text: str):
 
 
 def _handle_inline_template(doc, spec: dict, part_name: str):
-    """inline_template: 招标文件给模板,调 c_mode 填充能力。
+    """inline_template: 招标文件给模板(基本情况表/信誉声明等带变量占位的格式)。
 
-    本轮实现:写占位段落,提示"借用 c_mode_fill 填充"。
-    真实填充需用户手工触发 c_mode_fill 或未来 b_mode_fill 扩展。
+    行为: 产占位段, 由使用者投标前手工按 items 字段清单填写。同 self_drafted
+    定位 — 工具不自动化, 投标方人填。
+
+    历史: V3-1 期 docstring 提"未来由 b_mode_fill 自动调 c_mode_fill 完成
+    填充 (留 V4)" — 但 V4 全期无真实需求驱动 (低频, 投标方人填 2 分钟内
+    搞定, 跨模块自动化 ROI 低), 决策不做。V4 收口后 (V4-7a / v4_backlog
+    ee596be 期间) 顺手诚实化删 "留 V4" 承诺字面。
     """
     title = spec.get('section_title', '<untitled>')
     _append_heading(doc, f"{spec.get('section_id', '')} {title}")
     _append_placeholder_body(
         doc,
         f"[inline_template 占位] 本段为招标文件给定模板的变量填充。"
-        f"当前 B 模式基建阶段不实际调用 c_mode 填充能力,"
-        f"产出 assembled.docx 后请手工按 variables 要求填写,"
-        f"或在材料管理子系统上线后通过 b_mode_fill 自动调 c_mode 填充完成。"
+        f"产出 assembled.docx 后请使用者手工按 items 字段清单填写。"
     )
     items = spec.get('items') or []
     if items:
