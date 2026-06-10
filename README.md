@@ -53,7 +53,7 @@ install.bat
 - **评分矩阵追踪**:10 列 CSV 把每一分拆到应答章节,杜绝漏答
 - **项目类型识别**:工程 / 平台 / 研究 / 规划 / 其他 5 类自动选 outline 模板
 - **docx 渲染质量**:统一中文宋体、黑色标题、图占位区块、字号相对规则、空格自动清理
-- **B 模式材料组装(表格 + 段落样式保真,V4-1a)**:asset 注入 assembled.docx 走 OXML element 拷贝,表格(含列宽)、段落级样式、字体、加粗保真;图片保真留 V4-1b;公章不做(签章是用户的法律动作,工具不代为生成,投标时用户自行处理公章页);扫描件保真待定。无命中时产占位 + `.pending_marker`,V45 合并器列入 `pending_manual_work.md`
+- **B 模式材料组装(当前为文本提取)**:从 assets 库按 asset_type / 公司 id 查找真实材料(CuratedLocalAssetsProvider),提取段落文本合并到 assembled.docx;表格 / 图片 / 公章 / 扫描件保真留 V4。无命中时产占位 + `.pending_marker`,V45 合并器列入 `pending_manual_work.md`
 - **C 模式非交互填充**:一键跑完所有 C 模式 Part,变量缺失时 filled.docx 写入"【待填:变量描述】"显式占位
 - **跨章节一致性检查**:团队成本 vs 预算、承诺时间 vs 工期等自相矛盾类错误自动捕获
 - **Claude Code 深度协作契约**:CLAUDE.md 定义 6 条硬红线,AI 行为可预期

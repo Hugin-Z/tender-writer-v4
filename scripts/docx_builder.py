@@ -125,29 +125,11 @@ DEFAULT_STYLES = {
     "Heading 4":  {"east_asia": "黑体",   "size": 12,   "bold": True},   # H4 小四 12pt
 }
 
-# V4-1a.10/.12: 表格字号约定单一事实源 ("表格字体比正文小一号" 14pt→12pt)
-# V4-1a.10 原计划三处派生: TableNormal style sz + add_table per-run set
-# + _body_size_to_table_size。V4-1a.12 实测发现 TableNormal style sz 对 cell
-# 文字无效 (OXML 字号继承优先级: 段落 style Normal sz=28 压过表格 style
-# TableNormal sz=24), V4-1a.10 设的 TableNormal sz 是死代码已删。
-# V4-1a.12 后真实派生路径剩两条 (run-level 优先级最高, XML 有则 WPS 必取):
-#   1. add_table per-run set_run_font(size_pt=DEFAULT_TABLE_SIZE_PT)
-#   2. b_mode_fill._apply_table_cell_size_to_runs (V4-1a.12 新, 给注入 cell run set)
-# _body_size_to_table_size 保留函数签名向后兼容, 内部读本常量。
-DEFAULT_TABLE_SIZE_PT = 12
-
 
 def apply_default_styles(doc: Document):
     """
     把默认样式表应用到文档的 Normal / Heading 1~4。
     v2:强制所有样式颜色为黑色 RGB(0,0,0),覆盖 Word 主题色。
-
-    V4-1a.12 历史备注: V4-1a.10 曾在本函数末尾加 TableNormal style sz=24
-    分支期望"表格字号统一兜底", 实测发现 OXML 字号继承中段落 style Normal
-    sz=28 优先级高于表格 style TableNormal sz=24, TableNormal sz 永远被
-    Normal 覆盖, 对 cell 文字无效。V4-1a.12 删之 (死代码); 表格字号统一改
-    由 add_table per-run set + b_mode_fill._apply_table_cell_size_to_runs
-    两条 run-level 路径保证 (run-level 优先级最高, XML 有则 WPS 必取)。
     """
     for style_name, conf in DEFAULT_STYLES.items():
         try:
@@ -239,12 +221,14 @@ def add_chapter(doc: Document, title: str, level: int = 1):
 
 
 def _body_size_to_table_size(body_size_pt: float) -> float:
-    """V4-1a.10: 改读 DEFAULT_TABLE_SIZE_PT 单一事实源, 不再多档自适应。
-    保留函数签名向后兼容历史调用 (add_table size_pt=None fallback 仍走本函数)。
-    多档自适应 (v2 原 14→12 / 12→10.5 / 9→9) 已废弃 — V4-1a.10 起表格字号
-    由 DEFAULT_TABLE_SIZE_PT 单一常量定义, body_size_pt 参数不再消费。
+    """v2:表格字号相对规则。
+    正文四号(14)→ 表格小四(12);正文小四(12)→ 表格五号(10.5);正文小五(9)→ 表格小五(9)。
     """
-    return float(DEFAULT_TABLE_SIZE_PT)
+    if body_size_pt >= 14:
+        return 12.0
+    if body_size_pt >= 12:
+        return 10.5
+    return max(body_size_pt, 9.0)
 
 
 def add_table(doc: Document, headers: list, rows: list,
@@ -265,18 +249,6 @@ def add_table(doc: Document, headers: list, rows: list,
     table = doc.add_table(rows=1 + len(rows), cols=len(headers))
     table.style = "Table Grid"
 
-    # V4-1a.10 设计备注 — 不要把下面的 per-run set_run_font(size_pt=size_pt) 删掉:
-    #
-    # add_table 走 per-run 显式 set 字号 + master TableNormal style 兜底字号
-    # 两层并存, 两层都从 DEFAULT_TABLE_SIZE_PT 单一常量派生 (size_pt 默认走
-    # _body_size_to_table_size 读常量), 视觉结果完全一致 = 12pt。
-    #
-    # 这层冗余是裁定 C (V4-1a.10 plan §C) 的产物, 不是 bug:
-    # - 收敛方案 (去掉 per-run set, 只靠 style 兜底) 需要让 set_run_font 接受
-    #   size_pt=None, 而 set_run_font 是全仓多处共用 helper, 改接口 ripple 大。
-    # - 保留 per-run + style 双层, 既 R10 干净 (单一常量), 又不动 set_run_font 接口。
-    # - 改表格字号时只改 DEFAULT_TABLE_SIZE_PT 一处即可, 两层自动同步。
-    #
     # 表头
     hdr_cells = table.rows[0].cells
     for i, h in enumerate(headers):
