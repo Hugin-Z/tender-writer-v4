@@ -106,7 +106,9 @@ TRACKED_OUTPUTS = {
     # C.5 切片(开标一览表,C-template 三件套)
     # V4-0.2 修正(audit §5 #2):原注释/entry 标 V60 C-reference 首例,
     # 实测 demo_cadre_training 该 Part sub_mode=C-template,产 filled.docx 而非
-    # instructions.md。C-reference 首例待 V4-3 收尾时由 demo 真实跑通后补 entry。
+    # instructions.md。C-reference 首例执行端样例 V4-3 评估后决定不建
+    # (demo_cadre_training 无单独提交件需求),推迟到 V4 整体完成后由真实
+    # 使用场景驱动补 entry。
     'c_mode/开标一览表/template.docx': 'c_mode/开标一览表/template.docx',
     'c_mode/开标一览表/variables.yaml': 'c_mode/开标一览表/variables.yaml',
     'c_mode/开标一览表/filled.docx': 'c_mode/开标一览表/filled.docx',

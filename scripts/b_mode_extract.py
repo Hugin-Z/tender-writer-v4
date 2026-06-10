@@ -19,6 +19,7 @@ b_mode_extract.py · B 模式材料组装清单产出(V61)
 from __future__ import annotations
 
 import argparse
+import csv
 import json
 import re
 import sys
@@ -82,6 +83,9 @@ def cmd_extract_text(args, project_dir: Path):
         print(f"[错误] source_anchor 校验失败: {e}", file=sys.stderr)
         sys.exit(1)
 
+    # V4-2a: 同时产 scoring_matrix_excerpt.md (本 Part 关联评分项的关键词 +
+    # 证据材料) + assets_inventory.json (库内候选清单), 供 AI 写
+    # intermediate.json 时 awareness 选材。详见函数末尾 sidecar 写盘。
     raw_path = out_dir / 'raw.txt'
     if anchor_type == 'text':
         text = '\n'.join(t for _, t in resolved)
@@ -97,12 +101,65 @@ def cmd_extract_text(args, project_dir: Path):
         text = '\n\n'.join(sections)
     raw_path.write_text(text, encoding='utf-8')
 
+    # ── V4-2a sidecar 1: scoring_matrix_excerpt.md ──
+    # 从 output/scoring_matrix.csv 过滤 评分项归属 == part['name'] 的行,
+    # 渲染 markdown 表 (评分项 / 分值 / 关键词 / 证据材料 四列)。
+    # CSV 不存在时产空表 + 注明 (不报错; 阶段 1 后阶段 2 跑过即有 CSV)。
+    excerpt_path = out_dir / 'scoring_matrix_excerpt.md'
+    csv_path = project_dir / 'output' / 'scoring_matrix.csv'
+    excerpt_lines = [f"# scoring_matrix 评分项摘录 · Part: {part['name']}", ""]
+    if not csv_path.exists():
+        excerpt_lines.append("> 注:scoring_matrix.csv 尚未生成 (需先跑阶段 2 "
+                             "build_scoring_matrix.py)。")
+        excerpt_lines.append("> AI 写 intermediate.json 时无评分项参考,"
+                             "仅凭 raw.txt + assets_inventory 选材。")
+    else:
+        with open(csv_path, 'r', encoding='utf-8-sig', newline='') as f:
+            rows = [r for r in csv.DictReader(f)
+                    if (r.get('评分项归属') or '').strip() == part['name']]
+        if not rows:
+            excerpt_lines.append(f"> 注:scoring_matrix 中无 评分项归属 == "
+                                 f"'{part['name']}' 的行。本 Part 无关联评分项。")
+        else:
+            excerpt_lines.append(f"本 Part 关联 {len(rows)} 条评分项:")
+            excerpt_lines.append("")
+            excerpt_lines.append("| 评分项 | 分值 | 关键词 | 证据材料 |")
+            excerpt_lines.append("|---|---|---|---|")
+            for r in rows:
+                cells = [
+                    (r.get('评分项') or '').replace('|', '\\|'),
+                    (r.get('分值') or '').replace('|', '\\|'),
+                    (r.get('关键词') or '').replace('|', '\\|'),
+                    (r.get('证据材料') or '').replace('|', '\\|'),
+                ]
+                excerpt_lines.append('| ' + ' | '.join(cells) + ' |')
+    excerpt_path.write_text('\n'.join(excerpt_lines) + '\n', encoding='utf-8')
+
+    # ── V4-2a sidecar 2: assets_inventory.json ──
+    # 调 CuratedLocalAssetsProvider.enumerate_inventory() 扫库, 写盘供 AI awareness。
+    # 不读 frontmatter (留 V4-2b)。assets/ 目录不存在 → 产空 inventory + 标注。
+    inventory_path = out_dir / 'assets_inventory.json'
+    from assets_provider import CuratedLocalAssetsProvider
+    inventory = CuratedLocalAssetsProvider().enumerate_inventory()
+    inventory_path.write_text(
+        json.dumps({"inventory": inventory, "size": len(inventory)},
+                   ensure_ascii=False, indent=2),
+        encoding='utf-8'
+    )
+
     print(f"[完成] Part[{args.part}] '{part['name']}' 原文已写入: {raw_path}")
+    print(f"[完成] V4-2a sidecar: {excerpt_path} (本 Part 评分项摘录)")
+    print(f"[完成] V4-2a sidecar: {inventory_path} (库内候选 {len(inventory)} 条)")
     print()
     print("=" * 60)
-    print("下一步(Step 3):把 raw.txt 内容发给 AI,附上以下 prompt 构建 intermediate.json:")
+    print("下一步(Step 3):AI 写 intermediate.json 必须读三件源 (V4-2a):")
+    print("  (a) raw.txt                        ← 招标文件原文片段")
+    print("  (b) scoring_matrix_excerpt.md      ← 本 Part 关联评分项关键词 + 证据材料")
+    print("  (c) assets_inventory.json          ← 库内候选清单 (filename/company_id/year)")
+    print("AI 在 asset_query 字段写 inventory_match (从候选清单选中的真实条目);")
+    print("库内无匹配候选时 inventory_match 标占位 (__PENDING_USER__), 不盲写不存在的 name。")
     print()
-    print("  (见 docs/business_model_v1.md §8 #N21;原 brief_schema.B_MODE_EXTRACT_PROMPT")
+    print("  (prompt 字面见 docs/business_model_v1.md §8 #N21;原 brief_schema.B_MODE_EXTRACT_PROMPT")
     print("   常量已在 v1 P2 清理中删除,迁移到 business_model §8 #N21)")
     print()
     print("intermediate.json 结构:")

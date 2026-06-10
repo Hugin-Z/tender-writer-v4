@@ -18,12 +18,15 @@ source_type 分流:
 from __future__ import annotations
 
 import argparse
+import copy
 import re
 import sys
 from pathlib import Path
 
 try:
     from docx import Document
+    from docx.oxml import OxmlElement
+    from docx.oxml.ns import qn
     from docx.shared import Pt
 except ImportError:
     print("[错误] 缺少 python-docx 依赖,请先双击 install.bat 安装依赖。", file=sys.stderr)
@@ -78,6 +81,210 @@ def _handle_inline_template(doc, spec: dict, part_name: str):
         _append_placeholder_body(doc, f"字段清单: {', '.join(str(i) for i in items)}")
 
 
+def _build_style_id_map(src_doc, dst_doc) -> dict[str, str]:
+    """V4-1a S2: 建 {源 styleId → master styleId} 映射, 按 w:name 对齐。
+
+    源 docx (e.g. WPS 导出) 用数字 styleId (如 "12"), master (python-docx
+    Document) 用 Word 标准 styleId (如 "TableGrid"), 但 w:name 一致
+    ("Table Grid")。本函数按 w:name 做 name-based rebind 映射。
+
+    返 dict {src_styleId: master_styleId}; 源端 styleId 在 master 无同 w:name
+    则该 styleId 不入 dict (caller _rebind_or_strip_refs 走 strip + warning
+    路径)。
+    """
+    src_styles = src_doc.styles.element
+    dst_styles = dst_doc.styles.element
+    src_id_to_name: dict[str, str] = {}
+    for s in src_styles.findall(qn('w:style')):
+        sid = s.get(qn('w:styleId'))
+        nm = s.find(qn('w:name'))
+        if sid and nm is not None:
+            name_val = nm.get(qn('w:val'))
+            if name_val:
+                src_id_to_name[sid] = name_val
+    name_to_dst_id: dict[str, str] = {}
+    for s in dst_styles.findall(qn('w:style')):
+        sid = s.get(qn('w:styleId'))
+        nm = s.find(qn('w:name'))
+        if sid and nm is not None:
+            name_val = nm.get(qn('w:val'))
+            if name_val:
+                name_to_dst_id[name_val] = sid
+    return {sid: name_to_dst_id[name]
+            for sid, name in src_id_to_name.items()
+            if name in name_to_dst_id}
+
+
+def _rebind_or_strip_refs(elem, style_map: dict[str, str],
+                          part_name: str = '') -> tuple[int, int, int]:
+    """V4-1a S2: 对 deepcopy 后的 element 做跨 part ref 处理。
+
+    - <w:tblStyle w:val=X> / <w:pStyle w:val=X>:
+      * X 在 style_map 内 → 改 X 为 map[X] (name-based rebind, 零视觉损失)
+      * 否则 → strip 该 ref + emit warning (回退 master 默认样式)
+    - <w:numPr> (含 numId / ilvl): strip 整 numPr + emit warning
+      (V4-1a 主动降级, master 端无 multilevel decimal 可复用; 段落字面
+      无编号前缀, 标题语义由 pStyle rebind 保留; 详见 plans/v4-1a.md)
+
+    rebind/strip 对 elem (deepcopy 副本) 操作, 不动源 docx。
+
+    返 (rebind_count, strip_style_count, strip_num_count) 供统计。
+    """
+    rebind_n = 0
+    strip_style_n = 0
+    strip_num_n = 0
+    for tag_qn in (qn('w:tblStyle'), qn('w:pStyle')):
+        for ref in list(elem.iter(tag_qn)):
+            val = ref.get(qn('w:val'))
+            if val is None:
+                continue
+            if val in style_map:
+                ref.set(qn('w:val'), style_map[val])
+                rebind_n += 1
+            else:
+                ref.getparent().remove(ref)
+                strip_style_n += 1
+                print(f"[警告] V4-1a B asset 注入 [{part_name}]: styleId={val!r} "
+                      f"在 master 端无同名样式, strip 后回退 master 默认",
+                      file=sys.stderr)
+    for numPr in list(elem.iter(qn('w:numPr'))):
+        numPr.getparent().remove(numPr)
+        strip_num_n += 1
+        print(f"[警告] V4-1a B asset 注入 [{part_name}]: numPr (自动编号前缀) "
+              f"strip, 如需可手补编号字面", file=sys.stderr)
+    return rebind_n, strip_style_n, strip_num_n
+
+
+def _apply_explicit_fonts_to_runs(elem) -> int:
+    """V4-1a.6 fix: 给搬入 element 的每个 <w:r> 补显式 <w:rFonts> 字体名,
+    防 deepcopy 注入后中文 fallback 到 MS 明朝 (L4 灾难复现) + 西文 fallback
+    到 theme minorLatin。
+
+    源 docx (e.g. WPS 导出 1.docx) run 的 rFonts 通常仅 w:hint="eastAsia"
+    无显式字体名, 靠 theme minorEastAsia / minorLatin 解字体; 注入 master 后
+    master theme ea="" → WPS/Word fallback 到系统 CJK 默认 (MS 明朝, 日文)。
+
+    本函数补显式 rFonts (跟 master apply_default_styles 给 Normal 设的字体一致):
+    - w:eastAsia → 宋体 (master 中文)
+    - w:ascii    → Times New Roman (master 西文 ASCII)
+    - w:hAnsi    → Times New Roman (master 西文高位 ANSI)
+    - w:cs       → Times New Roman (复杂脚本, 跟 set_run_font 同型)
+
+    设计要点: **仅在对应属性不存在时 set** (不覆盖源 docx 已有显式字体)。
+    源若某 run 显式指定了字体名 (非靠主题), 保留源的; 只补"靠主题"的 run。
+    本 bug 修的是"靠主题导致 fallback", 不是"强制统一所有字体"。
+
+    返回补了多少个 attribute (供日志/测试统计)。
+    """
+    fonts = (
+        (qn("w:eastAsia"), "宋体"),
+        (qn("w:ascii"),    "Times New Roman"),
+        (qn("w:hAnsi"),    "Times New Roman"),
+        (qn("w:cs"),       "Times New Roman"),
+    )
+    n = 0
+    for r in elem.iter(qn("w:r")):
+        rpr = r.find(qn("w:rPr"))
+        if rpr is None:
+            rpr = OxmlElement("w:rPr")
+            r.insert(0, rpr)
+        rfonts = rpr.find(qn("w:rFonts"))
+        if rfonts is None:
+            rfonts = OxmlElement("w:rFonts")
+            rpr.insert(0, rfonts)
+        for attr_qn, font_val in fonts:
+            if rfonts.get(attr_qn) is None:
+                rfonts.set(attr_qn, font_val)
+                n += 1
+    return n
+
+
+def _normalize_run_size(elem) -> int:
+    """V4-1a.9 字号归化: 删搬入 element 内所有 <w:rPr> 下的 <w:sz> 和 <w:szCs>
+    子元素, 让字号回落 master Normal style (14pt) 实现字号统一。
+
+    源 docx run 通常带显式字号 (e.g. 1.docx 全 sz=24=12pt, szCs=21=10.5pt),
+    跟 master 不一致导致注入后表格字号飘。删 sz/szCs 让字号回落 style 系统,
+    显示 master Normal 字号。
+
+    设计要点 (跟 V4-1a.6 字体 fix "显式 set" 互补):
+    - 字体怕 fallback (主题解不到 → MS 明朝灾难), 所以 V4-1a.6 显式 set 字体名
+    - 字号有 master style 兜底 (style 系统 cascade 到 Normal 14pt),
+      所以这里"删标签回落" 更干净, 不假装"已对齐"
+
+    边界 (绝不误伤):
+    - 不碰 <w:rFonts> (V4-1a.6 补的显式字体, 删了 MS 明朝 fallback 回来)
+    - 不碰 <w:b> / <w:i> / <w:u> (强调, 尺度乙保留)
+    - 不碰 pPr 的 <w:spacing> / <w:ind> (段距/缩进, 中文排版裁定窄保留)
+    - 不碰表格 tblGrid 列宽
+
+    遍历位置: elem.iter(<w:rPr>) → 找 rPr 直接子的 <w:sz> 和 <w:szCs> 删之。
+    会扫到 run 级 rPr (在 <w:r> 内) + 段落标记字符的 rPr (在 <w:pPr> 内) +
+    style def 内 rPr (本函数只处理搬入 element 副本, style def 不在范围)。
+
+    返回剥了多少 sz/szCs 标签 (供日志/测试统计)。
+    """
+    n = 0
+    sz_qn = qn("w:sz")
+    szCs_qn = qn("w:szCs")
+    for rpr in elem.iter(qn("w:rPr")):
+        for tag in (sz_qn, szCs_qn):
+            for el in rpr.findall(tag):
+                rpr.remove(el)
+                n += 1
+    return n
+
+
+def _apply_table_cell_size_to_runs(elem) -> int:
+    """V4-1a.12 表格 cell 字号 per-run 真修: 给搬入 element 内 <w:tbl> 范围下
+    所有 <w:r> 的 rPr 显式 set <w:sz> + <w:szCs> = DEFAULT_TABLE_SIZE_PT (12pt),
+    确保注入表格 cell 文字在 WPS/Word 渲染为约定的 12pt。
+
+    根因背景 (Phase 0 实测):
+    - V4-1a.10 给 master TableNormal style 加 sz=24 期望"兜底"全表格字号,
+      实测 OXML 字号继承优先级: 段落 style Normal sz=28 (14pt) 压过表格 style
+      TableNormal sz=24, TableNormal sz 永远被 Normal 覆盖, 对 cell 文字无效。
+    - add_table 生产表格 12pt 实际靠 per-run set_run_font(size_pt=12) 生效
+      (run-level rPr.sz 优先级最高, 直接生效, 不依赖继承链)。
+    - 注入表格 cell 段落无 pStyle → 隐式 Normal → run 无 sz (V4-1a.9 已剥)
+      → 取 Normal sz=28 = 14pt (错)。
+    修法: 给注入 cell run 跟 add_table 同款 per-run set 12pt, run-level rPr.sz
+    优先级最高, XML 有则 WPS 必取, 不赌继承链。
+
+    设计要点:
+    - **只对 <w:tbl> 范围内 run set**, 不动表外段落 run (表外字号继续走
+      V4-1a.9 剥后回落 Normal 14pt 不动)
+    - **set 等价 add** (前空): V4-1a.9 已剥 cell run 的 sz + szCs 两者
+      (实测 _normalize_run_size L228-234 同剥), 所以这里 set 实际是从空到 12pt,
+      非"覆盖式"语义 — 但即使将来 V4-1a.9 改成只剥 sz 不剥 szCs, 这里覆盖式
+      set 也正确 (字号约定就是要统一 12pt, 不容源端 szCs 残留)
+    - 跟 V4-1a.6 字体 fix 同型 (run-level 显式 set 不赌继承, 字号约定确定性
+      生效)
+
+    返回 set 的 attribute count (供日志/测试统计)。
+    """
+    # 延迟 import 跟 _main_body 内 apply_default_styles 调用同型,
+    # 避免 b_mode_fill 顶层依赖 docx_builder 形成耦合。
+    from docx_builder import DEFAULT_TABLE_SIZE_PT
+    val_str = str(DEFAULT_TABLE_SIZE_PT * 2)  # 半 point
+    n = 0
+    for tbl in elem.iter(qn("w:tbl")):
+        for r in tbl.iter(qn("w:r")):
+            rpr = r.find(qn("w:rPr"))
+            if rpr is None:
+                rpr = OxmlElement("w:rPr")
+                r.insert(0, rpr)
+            for tag_prefix in ("w:sz", "w:szCs"):
+                existing = rpr.find(qn(tag_prefix))
+                if existing is not None:
+                    rpr.remove(existing)
+                sz_el = OxmlElement(tag_prefix)  # OxmlElement 需 prefix string
+                sz_el.set(qn("w:val"), val_str)
+                rpr.append(sz_el)
+                n += 1
+    return n
+
+
 def _handle_asset_lookup(doc, spec: dict, provider, part_name: str):
     """asset_lookup: 走 AssetsProvider 接口。
 
@@ -103,12 +310,66 @@ def _handle_asset_lookup(doc, spec: dict, provider, part_name: str):
     )
     resolved_path = provider.resolve(ref)
 
-    # 从 resolve 返回的 docx 拷贝段落内容到当前 doc
+    # V4-1a: 从源 docx OXML element 级 deepcopy 整段/整表搬入 (替代 V3-1 仅
+    # add_run(para.text) 文本搬运)。表格 (含 tblGrid 列宽) / 段落级样式 /
+    # run 级字体加粗 等 element 自带,deepcopy 即得保真。
+    # 跨 part ref (tblStyle / pStyle / numId) 由 S2 的 _rebind_refs 处理。
     src_doc = _DocxDocument(str(resolved_path))
-    for para in src_doc.paragraphs:
-        if para.text.strip():
-            new_p = doc.add_paragraph()
-            new_p.add_run(para.text)
+    src_body = src_doc.element.body
+    # V4-1a S2: 建源 → master 的 name-based styleId 映射 (per-asset 一次)
+    style_map = _build_style_id_map(src_doc, doc)
+    # 目标 body 末尾通常是 <w:sectPr> (section properties), 新 element 要
+    # insert 在它之前; 若无 sectPr 则直接 append。同 python-docx
+    # add_paragraph() 内部 _insert_p 策略。
+    dst_body = doc.element.body
+    dst_sectPr = dst_body.find(qn('w:sectPr'))
+    p_tag = qn('w:p')
+    tbl_tag = qn('w:tbl')
+    rebind_total = 0
+    strip_style_total = 0
+    strip_num_total = 0
+    font_apply_total = 0
+    size_strip_total = 0
+    cell_size_set_total = 0
+    for child in src_body.iterchildren():
+        if child.tag == p_tag:
+            # 跳过纯空段落 (沿 V3-1 trim 行为, 避免 DEMO PLACEHOLDER 类
+            # 尾部空段污染 assembled.docx)
+            texts = ''.join(t.text or '' for t in child.iter(qn('w:t')))
+            if not texts.strip():
+                continue
+        elif child.tag == tbl_tag:
+            # 表格无条件保留 (V4-1a 的核心保真目标)
+            pass
+        else:
+            # <w:sectPr> 等其他 element (section properties) 不搬,
+            # 目标 doc 用自己的 sectPr
+            continue
+        new_elem = copy.deepcopy(child)
+        # V4-1a S2: deepcopy 副本上做跨 part ref 处理 (rebind/strip)
+        r, ss, sn = _rebind_or_strip_refs(new_elem, style_map, part_name)
+        rebind_total += r
+        strip_style_total += ss
+        strip_num_total += sn
+        # V4-1a.6 fix: 补显式 rFonts 防 WPS/Word fallback (中文 MS 明朝 / 西文 Cambria)
+        font_apply_total += _apply_explicit_fonts_to_runs(new_elem)
+        # V4-1a.9 字号归化: 删 sz/szCs 让字号回落 master Normal (统一注入内容字号)
+        size_strip_total += _normalize_run_size(new_elem)
+        # V4-1a.12 表格 cell 字号真修: 给 <w:tbl> 内 run 显式 set 12pt
+        # (run-level 优先级最高, 不赌继承链; V4-1a.10 的 TableNormal style sz
+        # 被 Normal style 覆盖无效)
+        cell_size_set_total += _apply_table_cell_size_to_runs(new_elem)
+        if dst_sectPr is not None:
+            dst_sectPr.addprevious(new_elem)
+        else:
+            dst_body.append(new_elem)
+    if (rebind_total or strip_style_total or strip_num_total
+            or font_apply_total or size_strip_total or cell_size_set_total):
+        print(f"[信息] V4-1a [{part_name}] ref 处理: rebind={rebind_total}, "
+              f"strip_style={strip_style_total}, strip_num={strip_num_total}, "
+              f"font_apply={font_apply_total}, size_strip={size_strip_total}, "
+              f"cell_size_set={cell_size_set_total}",
+              file=sys.stderr)
 
     if ref.is_placeholder:
         _append_placeholder_body(

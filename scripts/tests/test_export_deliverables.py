@@ -82,31 +82,50 @@ def main() -> int:
     cases_run += 1
     brief = load_fixture("brief_a_b_c_mixed.json")
     mapping = build_deliverable_mapping(brief)
-    # 期望:static 2 + A 1 + B 1 + C-template 1 + C-reference 1 = 6
-    # C-attachment 和 D 不映射
-    expected_count = 6
+    # 期望: static 2 + A 1 + B 1 + C-template 1 + C-reference 1 + C-attachment 2 = 8
+    # V4-4 起 C-attachment 映射 2 entry (copy_dir attachments 目录 + copy _manifest.yaml);
+    # D 仍不映射
+    expected_count = 8
     ok_count = len(mapping) == expected_count
     a_entry = find_target(mapping, "A 模式产出/01_技术方案(分章节).docx")
     b_entry = find_target(mapping, "B 模式产出/02_业绩证明(占位).docx")
     ct_entry = find_target(mapping, "C 模式产出/03_格式响应.docx")
     cr_entry = find_target(mapping, "C 模式产出/04_操作说明操作说明.md")
-    cattach_entry = find_target(mapping, "C 模式产出/05_挂档资料.docx")  # 不应存在
+    # V4-4: C-attachment 双 entry (目录 + 同位置 _manifest.yaml)
+    cattach_dir_entry = find_target(mapping, "C 模式产出/05_挂档资料(附件)")
+    cattach_manifest_entry = find_target(mapping, "C 模式产出/05_挂档资料(附件)/_manifest.yaml")
     d_entry = find_target(mapping, "D 模式产出/06_外部信息.docx")  # 不应存在
 
     ok_a = a_entry is not None and a_entry.get("source") == "output/tender_response.docx"
     ok_b = b_entry is not None and b_entry.get("source") == "output/b_mode/业绩证明/assembled.docx"
     ok_ct = ct_entry is not None and ct_entry.get("source") == "output/c_mode/格式响应/filled.docx"
     ok_cr = cr_entry is not None and cr_entry.get("source") == "output/c_mode/操作说明/instructions.md"
-    ok_skip_cattach = cattach_entry is None
+    # V4-4 C-attachment 真行为断言 (替换原 ok_skip_cattach):
+    # - dir entry: 源是 final_tender_package/attachments/<dir_name>, mode='copy_dir'
+    # - manifest entry: 源是 output/c_mode/<dir_name>/attachments.yaml, mode='copy'
+    ok_cattach_dir = (
+        cattach_dir_entry is not None
+        and cattach_dir_entry.get("source") == "final_tender_package/attachments/挂档资料"
+        and cattach_dir_entry.get("mode") == "copy_dir"
+    )
+    ok_cattach_manifest = (
+        cattach_manifest_entry is not None
+        and cattach_manifest_entry.get("source") == "output/c_mode/挂档资料/attachments.yaml"
+        and cattach_manifest_entry.get("mode") == "copy"
+    )
     ok_skip_d = d_entry is None
 
-    case2_ok = all([ok_count, ok_a, ok_b, ok_ct, ok_cr, ok_skip_cattach, ok_skip_d])
+    case2_ok = all([ok_count, ok_a, ok_b, ok_ct, ok_cr,
+                    ok_cattach_dir, ok_cattach_manifest, ok_skip_d])
     icon = "PASS" if case2_ok else "FAIL"
-    print(f"  [{icon}] case_2_a_b_c_mixed: A+B+C-template+C-reference 各 1 + C-attachment/D 跳过 (happy path)")
+    # 注:本 case 验 build_deliverable_mapping() 返回的路径映射字符串,不验
+    # 产物实际落盘 (端到端落盘验证在 test_v45_merge.case_7_c_attachment_e2e)
+    print(f"  [{icon}] case_2_a_b_c_mixed: A+B+C-template+C-reference+C-attachment 映射, D 跳过 (V4-4 真行为)")
     if not case2_ok:
         print(f"           len: expected={expected_count}, actual={len(mapping)}")
-        print(f"           A entry ok={ok_a}, B ok={ok_b}, C-template ok={ok_ct}, C-reference ok={ok_cr}")
-        print(f"           skip C-attachment ok={ok_skip_cattach}, skip D ok={ok_skip_d}")
+        print(f"           A ok={ok_a}, B ok={ok_b}, C-template ok={ok_ct}, C-reference ok={ok_cr}")
+        print(f"           C-attachment dir ok={ok_cattach_dir}, manifest ok={ok_cattach_manifest}")
+        print(f"           skip D ok={ok_skip_d}")
         fails += 1
 
     # ---- case 3: 2 个 A 模式 part(无防重)----
