@@ -94,7 +94,21 @@ def build_deliverable_mapping(brief: dict) -> list[dict]:
                     "target": f"C 模式产出/{order:02d}_{name}操作说明.md",
                     "mode": "copy",
                 })
-            # C-attachment 挂档,不映射
+            elif sub == 'C-attachment':
+                # V4-4: 映射 attachment 目录 + 同位置带 _manifest.yaml (占位状态透传)。
+                # source dir 是 v45_merge 拷贝过去的 final_tender_package/attachments/<part>/,
+                # 只含 status=resolved 的真实附件(pending_user 项不在物理目录里, 不假装存在)。
+                # _manifest.yaml 同步导出, 让 bidder 在交付层直接看到各附件 status。
+                mapping.append({
+                    "source": f"final_tender_package/attachments/{dir_name}",
+                    "target": f"C 模式产出/{order:02d}_{name}(附件)",
+                    "mode": "copy_dir",
+                })
+                mapping.append({
+                    "source": f"output/c_mode/{dir_name}/attachments.yaml",
+                    "target": f"C 模式产出/{order:02d}_{name}(附件)/_manifest.yaml",
+                    "mode": "copy",
+                })
         elif mode == 'B':
             mapping.append({
                 "source": f"output/b_mode/{dir_name}/assembled.docx",
@@ -129,6 +143,17 @@ def _do_copy(src: Path, dst: Path) -> dict:
     dst.parent.mkdir(parents=True, exist_ok=True)
     shutil.copy2(src, dst)
     return {"mode": "copy", "src_size": src.stat().st_size, "dst_size": dst.stat().st_size}
+
+
+def _do_copy_dir(src: Path, dst: Path) -> dict:
+    """V4-4: 目录级拷贝 (C-attachment 用)。dirs_exist_ok=True 允许同目标多次写入
+    (如 attachments 目录 + 后续追加的 _manifest.yaml 共存)。
+    """
+    dst.parent.mkdir(parents=True, exist_ok=True)
+    shutil.copytree(src, dst, dirs_exist_ok=True)
+    n_files = sum(1 for _ in dst.rglob('*') if _.is_file())
+    total_size = sum(p.stat().st_size for p in dst.rglob('*') if p.is_file())
+    return {"mode": "copy_dir", "n_files": n_files, "dst_size": total_size}
 
 
 def _apply_xlsx_style(ws, n_cols: int):
@@ -286,7 +311,7 @@ def _main_body(args, project_dir):
     print(f"[信息] 映射表项数: {len(mapping)}")
     print()
 
-    stats_per_mode = {"copy": 0, "csv_to_xlsx": 0}
+    stats_per_mode = {"copy": 0, "csv_to_xlsx": 0, "copy_dir": 0}
     missing = []
     for item in mapping:
         src = project_dir / item['source']
@@ -308,6 +333,8 @@ def _main_body(args, project_dir):
                 info = _do_copy(src, dst)
             elif mode == 'csv_to_xlsx':
                 info = _do_csv_to_xlsx(src, dst)
+            elif mode == 'copy_dir':
+                info = _do_copy_dir(src, dst)
             else:
                 raise ValueError(
                     f"未知 mode: {mode}。v1 后 md→xlsx 不再走映射表,"
@@ -328,6 +355,7 @@ def _main_body(args, project_dir):
     print("=" * 60)
     print(f"[完成] 交付层导出完成 → {deliverable_root}")
     print(f"  copy:         {stats_per_mode['copy']} 项")
+    print(f"  copy_dir:     {stats_per_mode['copy_dir']} 项(V4-4 C-attachment)")
     print(f"  csv_to_xlsx:  {stats_per_mode['csv_to_xlsx']} 项")
     print(f"  md_to_xlsx:   主 agent 任务,不在自动映射(SKILL.md 阶段 6)")
     print()

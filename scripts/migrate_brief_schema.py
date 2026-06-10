@@ -158,8 +158,7 @@ def migrate_v10_to_v11(tender_brief: dict, sub_mode_judgments: dict[int, str]) -
     硬约束:
     - production_mode='C' 的 Part 必须在 sub_mode_judgments 中
     - production_mode 非 C 的 Part 不允许有 sub_mode
-    - 判定为 C-attachment 的 raise NotImplementedError(挂档)
-    - 判定值必须 ∈ SUB_MODE_VALUES
+    - 判定值必须 ∈ SUB_MODE_VALUES (含 'C-attachment',V4-4 起启封透传)
     """
     parts = tender_brief.get('response_file_parts', [])
     changed = False
@@ -178,11 +177,6 @@ def migrate_v10_to_v11(tender_brief: dict, sub_mode_judgments: dict[int, str]) -
                 raise ValueError(
                     f"Part[{idx}] sub_mode 判定值 '{new_sm}' 不在合法值"
                     f" {SUB_MODE_VALUES} 内"
-                )
-            if new_sm == 'C-attachment':
-                raise NotImplementedError(
-                    f"Part[{idx}] '{part.get('name')}' 判定为 C-attachment, "
-                    f"当前挂档,见 business_model §8 #N20。请用户决定如何处理。"
                 )
             if part.get('sub_mode') != new_sm:
                 part['sub_mode'] = new_sm

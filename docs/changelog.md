@@ -1,5 +1,18 @@
 # tender-writer 变更日志
 
+## V4-4 · 2026-05-29 C-attachment 真实现
+
+C-attachment(扫描件附件,整份文件单独挂,不进主响应文件文本流)从挂档状态真实现:schema 层原已收值,本次把 migrate / extract / fill / merge / export 五个执行端的 NotImplementedError / skip 改为真实业务分支,端到端跑通。
+
+- 边界:与 B 模式区分明确 —— B 模式素材内容融进 assembled.docx 文本流,C-attachment 整份文件作为独立附件单独挂,不进任何文本流。附件源复用本仓库 assets(CuratedLocalAssetsProvider 同型),不接外部源。
+- 占位策略:附件源文件缺失时产占位(`__PENDING_USER__`)不硬失败(部分附件本就需用户人工放置);占位状态显式可见 —— attachments 清单标占位 + operations_checklist 列出待人工放置项 + export 透传,不静默产空附件。
+- 测试:原 `case_5` / `ok_skip_cattach` 的"验整项跳过"断言改造为真行为断言(入 `merge_order` + `attachments` 产出 + `ops_checklist` 附件段 + 占位路径);fixture 去 `_skip` 后缀对齐真实现语义;新增 e2e case 覆盖 extract→fill→merge→export 全链路含占位条目。
+- 候选项登记(不在 V4-4 范围):招标文件「投标文件构成与装订」要求的结构化抽取 + 下游消费 —— 当前 parse_tender 仅以 section_anchors 标位置、未抽内容、无结构化字段、无下游消费,demo 实测该段全部【待补充】。附件目录布局现采用工具自定默认(`attachments/<part>/`),未消费招标文件装订要求。此项留 V4 后期评估。
+
+本次零 schema 层改动(C-attachment 在 brief_schema 已完整)、零 C-template/C-reference/A/B 模式现有逻辑改动;新增业务分支均参照同型 sub_mode 实现。
+
+---
+
 ## V4-3 · 2026-05-29 C-reference 诚实化收尾
 
 V4-3 经两轮 Phase 0 实测确认 C-reference 决策层已在 fixture 层验证(brief 解析 / v45_merge 分流 / export 映射三处纯函数断言),范围收敛为诚实化收尾,非功能实现。
