@@ -244,28 +244,56 @@ def _render_c_reference_section(part: dict, instructions_path: Path) -> str:
 
 
 def _post_merge_normalize(final_doc, fragments_info: list[dict]) -> dict:
-    """V4-skel.7 V4-7 结构占位: cross-doc 合并协调 hook, 当前 noop。
+    """V4-7a 浅做: 接 master 规范 apply 一次 + 整篇表格 cell 字号 set 一次。
+    V4-7b 深 (run-level normalize 整篇 + section + page_number) 押后等真实
+    多 Part 合并产物视觉冲突驱动 (跟 V4-1a 量级 cost)。
 
     接入点: composer.append 全跑完后、composer.save 之前。
     final_doc 是 composer 合并后的 master Document (尚未 save)。
 
-    实线 V4-7 实现层补:
-    - font_normalize: cross-doc 字体一致 (重应用 apply_default_styles 或更深)
-    - table_width_unify: 表格列宽统一 (V4-1a 单 doc 已 OK, 跨 doc 待协调)
-    - section_break: section 收敛 (docxcompose 默认每 fragment 一个 section)
+    V4-7a 浅做两维 (此 commit V4-7a.1 起):
+    - **font_normalize** = "done (style-level)" — 跑 apply_default_styles 解
+      docxcompose "后到优先" 让 anchor 自带 styles (e.g. Heading2 蓝色
+      4F81BD) 覆盖 master 黑色的问题。**仅 style 层有效, run-level direct
+      格式不剥** (那是 V4-7b 深, 跟 V4-1a 教训同型)。
+    - **table_cell_size** = "done" — 整篇 doc 内所有 <w:tbl> cell run 强
+      set sz/szCs=24 (12pt), 落回 V4-1a 表格小一号约定。复用 V4-1a.12
+      _apply_table_cell_size_to_runs helper (scope 从单 part 扩到整篇),
+      0 新 OXML 操作。
+
+    V4-7b 押后三维 (仍 noop, 等真实标驱动):
+    - table_width_unify: 跨 Part 表格列宽统一 (V4-1a 单 doc deepcopy 自带
+      列宽已对, 跨 Part 列宽是否要统一待真实多 Part 视觉冲突定)
+    - section_break: section 收敛 (docxcompose 默认每 fragment 一 section)
     - page_number_reset: 跨 fragment 页码连续 / restart
 
-    return 字典 4 维度均为 "noop" 字符串 (不用 True/False 防 R10 假"已协调")。
+    return 字典 5 维度: 2 维 "done (...)" 字符串明示做了什么 / 3 维 "noop"
+    字符串明示 V4-7b 押后 (不用 True/False 防 R10 假"已协调", 5 维必须
+    诚实摊开不能因为开始做就显得整个完成)。
     """
+    # V4-7a 浅做 step 1: style 层 apply (解 Heading 蓝色 + 字体一致 + 字号一致)
+    # 延迟 import 跟 v45_merge 现有 _create_part_divider / _create_inapplicable_doc
+    # 内 apply_default_styles 调用同型 (避免顶层依赖 docx_builder)。
+    from docx_builder import apply_default_styles
+    apply_default_styles(final_doc)
+
+    # V4-7a 浅做 step 2: 整篇 <w:tbl> cell run 强 set sz/szCs=24 (复用
+    # V4-1a.12 helper, 整篇遍历直接生效, helper 本身 elem.iter(qn("w:tbl"))
+    # 已经全遍历, 接 final_doc.element 整篇 doc 直接生效, 0 helper 改动)。
+    # 延迟 import 同上模式。
+    from b_mode_fill import _apply_table_cell_size_to_runs
+    cell_size_set_total = _apply_table_cell_size_to_runs(final_doc.element)
+
     result = {
         'fragments_count': len(fragments_info),
-        'font_normalize': 'noop',
+        'font_normalize': 'done (style-level)',
+        'table_cell_size': f'done ({cell_size_set_total} cell run set)',
         'table_width_unify': 'noop',
         'section_break': 'noop',
         'page_number_reset': 'noop',
     }
     print(
-        f"[V4-7 占位] post_merge_normalize: {result}",
+        f"[V4-7a 浅做] post_merge_normalize: {result}",
         file=sys.stderr,
     )
     return result
@@ -273,22 +301,34 @@ def _post_merge_normalize(final_doc, fragments_info: list[dict]) -> dict:
 
 def _write_merge_normalize_log(pkg_dir: Path, normalize_result: dict,
                                 fragments_info: list[dict]) -> None:
-    """V4-skel.8 V4-7 占位: 写 merge_normalize.log sidecar 到 final_tender_package/。
+    """V4-7a.1b V4-7a 浅做记录 + V4-7b 占位摊开: 写 merge_normalize.log sidecar
+    到 final_tender_package/。
 
-    内容 = _post_merge_normalize 返回的 result dict + per-fragment 元数据。
-    enum 值 "noop" 字符串 (Hugin Phase 1 裁定不用 True/False), 让 Hugin 看 log
-    直接知道是占位状态。
+    内容 = _post_merge_normalize 返回的 result dict (5 维度) + per-fragment 元数据。
+    enum 值 "noop" / "done (...)" 字符串 (Hugin Phase 1 裁定不用 True/False),
+    让 Hugin 看 log 直接知道是浅做 done 还是 V4-7b 押后 noop。
 
-    实线 V4-7 实现层后, 各维度会从 "noop" 变 "done" + 协调细节填进 fragment 段。
+    5 维度诚实摊开:
+    - font_normalize: "done (style-level)" — V4-7a 浅做完
+    - table_cell_size: "done (N cell run set)" — V4-7a 浅做完
+    - table_width_unify: "noop" — V4-7b 押后 (列宽统一)
+    - section_break: "noop" — V4-7b 押后
+    - page_number_reset: "noop" — V4-7b 押后
+
+    实线 V4-7b 实现层后, 押后三维会从 "noop" 变 "done" + 协调细节填进 fragment 段。
     """
     log_path = pkg_dir / 'merge_normalize.log'
+    # 文件头注按 V4-7a 实际状态写: 2 维 done + 3 维 noop, 不假装"整个 V4-7 完成"
     lines = [
-        '# V4-7 结构占位 merge_normalize.log',
-        '# 当前所有协调维度均为 "noop", 实线 V4-7 实现层',
+        '# V4-7a 浅做 merge_normalize.log (V4-7a.1 起)',
+        '# V4-7a 完成 2 维 (font_normalize style 层 + table_cell_size 整篇);',
+        '# V4-7b 押后 3 维 (table_width_unify / section_break / page_number_reset 仍 noop)',
+        '# 详见 docs/changelog.md V4-7a entry + plans/v4-7a.md',
         f'# fragments 数: {normalize_result["fragments_count"]}',
         '',
-        '## 协调维度',
+        '## 协调维度 (5 维)',
         f'font_normalize:     {normalize_result["font_normalize"]}',
+        f'table_cell_size:    {normalize_result["table_cell_size"]}',
         f'table_width_unify:  {normalize_result["table_width_unify"]}',
         f'section_break:      {normalize_result["section_break"]}',
         f'page_number_reset:  {normalize_result["page_number_reset"]}',

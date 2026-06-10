@@ -231,49 +231,60 @@ def main() -> int:
         print(f"           skipped_image_paras={skipped_image_paras} (expect 2)")
         fails += 1
 
-    # ─── case 6: V4-7 _post_merge_normalize 4 维度 noop + stderr 喊话 ───
+    # ─── case 6: V4-7a _post_merge_normalize 5 维度 (2 done + 3 noop) ───
+    # V4-7a.1 改写自 V4-skel.7 原 case_6 (验 4 维度全 noop)。V4-7a 浅做完 2 维
+    # (font_normalize style 层 + table_cell_size 整篇), V4-7b 押后 3 维仍 noop。
     cases += 1
     frags = [{'title': 'P1', 'src': '/tmp/f1.docx'},
              {'title': 'P2', 'src': '/tmp/f2.docx'}]
-    d_dummy = Document()
+    # V4-7a 调 apply_default_styles(final_doc) + _apply_table_cell_size_to_runs
+    # 都需要真实 Document, 不能用空 dummy。用临时 Document 测。
+    d_for_normalize = Document()
     result, stderr_text6 = _capture_stderr(
-        _post_merge_normalize, d_dummy, frags
+        _post_merge_normalize, d_for_normalize, frags
     )
-    expected_result = {
-        'fragments_count': 2,
-        'font_normalize': 'noop',
-        'table_width_unify': 'noop',
-        'section_break': 'noop',
-        'page_number_reset': 'noop',
-    }
-    has_v4_7_warn = '[V4-7 占位] post_merge_normalize' in stderr_text6
-    ok = result == expected_result and has_v4_7_warn
-    print(f"  [{'PASS' if ok else 'FAIL'}] case_6_v4_7_post_merge_normalize_noop "
-          f"(4 维度 'noop' + stderr 喊话生效)")
+    # V4-7a 5 维度: 2 done + 3 noop。table_cell_size value 含 "done" + cell run
+    # count (空 doc 无表格 → "done (0 cell run set)")。
+    ok = (
+        result['fragments_count'] == 2
+        and result['font_normalize'] == 'done (style-level)'
+        and result['table_cell_size'].startswith('done (')
+        and 'cell run set)' in result['table_cell_size']
+        and result['table_width_unify'] == 'noop'
+        and result['section_break'] == 'noop'
+        and result['page_number_reset'] == 'noop'
+    )
+    has_v4_7a_warn = '[V4-7a 浅做] post_merge_normalize' in stderr_text6
+    ok = ok and has_v4_7a_warn
+    print(f"  [{'PASS' if ok else 'FAIL'}] case_6_v4_7a_post_merge_normalize "
+          f"(5 维度: 2 done + 3 noop + stderr [V4-7a 浅做] 喊话)")
     if not ok:
         print(f"           result={result}")
-        print(f"           expected={expected_result}")
-        print(f"           has_v4_7_warn={has_v4_7_warn}")
+        print(f"           has_v4_7a_warn={has_v4_7a_warn}")
         fails += 1
 
-    # ─── case 7: V4-7 _write_merge_normalize_log sidecar 写 "noop" 字符串 ───
+    # ─── case 7: V4-7a _write_merge_normalize_log 5 维度 + 头注诚实化 ───
+    # V4-7a.1b 改写自 V4-skel.8 原 case_7 (验 4 维度 noop)。
     cases += 1
-    tmp_pkg = Path(tempfile.mkdtemp(prefix='v4skel_c7_pkg_'))
-    _write_merge_normalize_log(tmp_pkg, expected_result, frags)
+    tmp_pkg = Path(tempfile.mkdtemp(prefix='v4_7a_c7_pkg_'))
+    _write_merge_normalize_log(tmp_pkg, result, frags)
     log_text = (tmp_pkg / 'merge_normalize.log').read_text(encoding='utf-8')
     ok = (
-        '# V4-7 结构占位 merge_normalize.log' in log_text
-        and 'font_normalize:     noop' in log_text
+        '# V4-7a 浅做 merge_normalize.log' in log_text
+        and 'V4-7a 完成 2 维' in log_text
+        and 'V4-7b 押后 3 维' in log_text
+        and 'font_normalize:     done (style-level)' in log_text
+        and 'table_cell_size:    done (' in log_text
         and 'table_width_unify:  noop' in log_text
         and 'section_break:      noop' in log_text
         and 'page_number_reset:  noop' in log_text
         and "title='P1'" in log_text
         and "title='P2'" in log_text
     )
-    print(f"  [{'PASS' if ok else 'FAIL'}] case_7_v4_7_merge_normalize_log_sidecar "
-          f"(4 维度 'noop' + per-fragment 元数据)")
+    print(f"  [{'PASS' if ok else 'FAIL'}] case_7_v4_7a_merge_normalize_log "
+          f"(5 维度 + 头注 V4-7a 浅做 + V4-7b 押后 + per-fragment 元数据)")
     if not ok:
-        print(f"           log_text first 500 chars: {log_text[:500]!r}")
+        print(f"           log_text first 600 chars: {log_text[:600]!r}")
         fails += 1
 
     # ─── case 8: v4_placeholders_map.md 一张地图 (产物 schema 验证) ───
@@ -293,24 +304,96 @@ def main() -> int:
             'headers_footers_section_proxy': '占位生效 (len(sections) 代理)',
         },
         'V4-7': {
-            'font_normalize': 'noop',
+            # V4-7a 浅做完 (V4-7a.1/.1b)
+            'font_normalize': 'done (style-level)',
+            'table_cell_size': 'done (整篇 cell run sz/szCs=24)',
+            # V4-7b 押后 (3 维)
             'table_width_unify': 'noop',
             'section_break': 'noop',
             'page_number_reset': 'noop',
         },
     }
-    # 简验 schema 完整 (每个占位类至少 1 条目)
+    # 简验 schema 完整 (V4-7 维度从 4 noop → V4-7a 后 5 维, 2 done + 3 noop)
+    v4_7_dict = map_data.get('V4-7', {})
     ok = (
         'V4-2b' in map_data and len(map_data['V4-2b']) >= 3
         and 'V4-1b' in map_data and len(map_data['V4-1b']) >= 3
-        and 'V4-7' in map_data and len(map_data['V4-7']) == 4
-        and all(v == 'noop' for v in map_data['V4-7'].values())
+        and len(v4_7_dict) == 5
+        and v4_7_dict.get('font_normalize', '').startswith('done')
+        and v4_7_dict.get('table_cell_size', '').startswith('done')
+        and v4_7_dict.get('table_width_unify') == 'noop'
+        and v4_7_dict.get('section_break') == 'noop'
+        and v4_7_dict.get('page_number_reset') == 'noop'
     )
     print(f"  [{'PASS' if ok else 'FAIL'}] case_8_v4_placeholders_map_schema "
-          f"(覆盖 V4-2b/V4-1b/V4-7 全部占位生效点 schema)")
+          f"(V4-2b/V4-1b/V4-7 占位地图; V4-7 维度 5 维: 2 done V4-7a + 3 noop V4-7b)")
     if not ok:
         print(f"           map_data={json.dumps(map_data, ensure_ascii=False, indent=2)}")
         fails += 1
+
+    # ─── case 9: V4-7a 招牌 — anchor 合并端到端验生效 (沿 V4-1a 验生效教训) ───
+    # V4-7a.2 新增。模拟 V45 合并 anchor 1.docx + 跑 _post_merge_normalize 后实测
+    # 合并产物 OXML 生效层 (不只验 helper 返 dict, 真验渲染层 XML 字段值):
+    #   (a) styles.xml Heading2 color=000000 (anchor 自带 4F81BD 蓝被 apply 压回)
+    #   (b) 整篇 doc 内 <w:tbl> cell run rPr 含 sz=24 (跨 Part cell 字号一致 12pt
+    #       约定不被 docxcompose 合并后 cell run 自带 sz 飘开)
+    #   (c) Normal sz=28 (14pt apply 后)
+    # anchor: assets/公司资质/own_demo/_raw/1.docx (V4-1a 实测过的 9×7 业绩表 +
+    # Heading2 蓝色 4F81BD anchor)。
+    cases += 1
+    from docxcompose.composer import Composer  # noqa: E402
+    ANCHOR_V41A = REPO / 'assets' / '公司资质' / 'own_demo' / '_raw' / '1.docx'
+    if not ANCHOR_V41A.exists():
+        print(f"  [SKIP] case_9_v4_7a_merge_end_to_end_effective "
+              f"(anchor 1.docx 缺, V4-1a 期间应已 push)")
+    else:
+        master_doc = Document()
+        composer = Composer(master_doc)
+        composer.append(Document(str(ANCHOR_V41A)))
+        merge_frags = [{'title': '资质证明 (V4-1a anchor)', 'src': str(ANCHOR_V41A)}]
+        _, _ = _capture_stderr(_post_merge_normalize, master_doc, merge_frags)
+
+        out_merged = Path(tempfile.mkstemp(suffix='.docx', prefix='v4_7a_c9_')[1])
+        composer.save(str(out_merged))
+
+        with zipfile.ZipFile(out_merged) as z:
+            merged_styles = z.read('word/styles.xml').decode('utf-8')
+            merged_docxml = z.read('word/document.xml').decode('utf-8')
+
+        # (a) Heading2 color 压回黑 (anchor 自带 4F81BD)
+        h2_match = re.search(
+            r'<w:style[^>]*w:styleId="Heading2"[^>]*>.*?</w:style>',
+            merged_styles, re.DOTALL,
+        )
+        h2_color = re.search(r'<w:color w:val="([^"]+)"', h2_match.group(0)) if h2_match else None
+        h2_color_ok = h2_color is not None and h2_color.group(1) == '000000'
+
+        # (b) 整篇表格 cell run 含 sz=24 (V4-7a cell sz set 整篇生效)
+        tbl_match = re.search(r'<w:tbl>.*?</w:tbl>', merged_docxml, re.DOTALL)
+        tbl_xml = tbl_match.group(0) if tbl_match else ''
+        table_runs = re.findall(r'<w:r\b[^>]*>.*?</w:r>', tbl_xml, re.DOTALL)
+        runs_with_sz24 = sum(1 for r in table_runs if '<w:sz w:val="24"/>' in r)
+        cell_sz_ok = len(table_runs) > 0 and runs_with_sz24 == len(table_runs)
+
+        # (c) Normal sz=28 (14pt, apply 后)
+        normal_match = re.search(
+            r'<w:style[^>]*w:styleId="Normal"[^>]*>.*?</w:style>',
+            merged_styles, re.DOTALL,
+        )
+        normal_sz = re.search(r'<w:sz w:val="(\d+)"', normal_match.group(0)) if normal_match else None
+        normal_sz_ok = normal_sz is not None and normal_sz.group(1) == '28'
+
+        ok = h2_color_ok and cell_sz_ok and normal_sz_ok
+        print(f"  [{'PASS' if ok else 'FAIL'}] case_9_v4_7a_merge_end_to_end_effective "
+              f"(招牌: 合并产物 Heading2 黑 + cell sz=24 整篇 + Normal sz=28)")
+        if not ok:
+            print(f"           (a) Heading2 color: {h2_color.group(1) if h2_color else '<none>'} "
+                  f"(expect 000000) -> {'PASS' if h2_color_ok else 'FAIL'}")
+            print(f"           (b) cell run sz=24: {runs_with_sz24}/{len(table_runs)} "
+                  f"(expect 全数 > 0) -> {'PASS' if cell_sz_ok else 'FAIL'}")
+            print(f"           (c) Normal sz: {normal_sz.group(1) if normal_sz else '<none>'} "
+                  f"(expect 28) -> {'PASS' if normal_sz_ok else 'FAIL'}")
+            fails += 1
 
     # ─── 汇总 ───
     print()

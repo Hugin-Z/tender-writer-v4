@@ -34,7 +34,7 @@
 
 ### V4-7 · V45 合并器格式协调(多 Part 合并的字体 / 表格 / 页码 / 图片一致)
 
-**状态**: **结构层已补(V4-skel,2026-06)** — `v45_merge` 在 `composer.append` 后、`composer.save` 前接入 `_post_merge_normalize` hook(当前 noop)+ 产 `merge_normalize.log` 记录四维协调状态(全 `"noop"` 字符串)。实现层(cross-doc 协调规则)**待真实多 Part 合并的视觉冲突驱动**,深度与 V4-1a 同类。
+**状态**: **V4-7a 浅做完(2026-06,V4-7a.1/.1b/.2/.3)** —— `_post_merge_normalize` 浅做两维:`font_normalize: done (style-level)`(解 docxcompose 后到优先导致的 anchor Heading 蓝色)+ `table_cell_size: done`(整篇 cell run sz=24,复用 V4-1a.12 helper)。`merge_normalize.log` 五维诚实摊开(2 done / 3 noop)。**V4-7b 深押后 3 维**(run-level normalize 整篇 + section 收敛 + 页码 reset):待真实多 Part 合并产物视觉冲突驱动,与 V4-1a 同量级 cost,且做不做取决于 V4-7a 浅做完视觉是否够好 —— **不可假设 V4-7 整个完成**。
 **卡在**: Hugin 重新掂量投入产出后才定要不要做 / 做到什么保真度
 **范围**(实现层): cross-doc 表格列宽统一 / section break 收敛(全局单 section 或 section restart numbering 显式控制)/ 段前段后规整 fragment pass / 跨 part 字体一致
 **字面源**: `docs/changelog.md` V4-skel entry V4-7 bullet + V4-1a 收口时 Hugin 心里有数 — "docx 深度格式保真比 V4-1a 还深,假设→撞→修方式做大概率比这条线还长(13 commit / 6 轮 bug)"
@@ -100,6 +100,7 @@ V4 已落地的活,跨会话起手时不要重新做:
 - **V4-4**: C-attachment 真实现(5 处 raise/skip → 真分支 + e2e 跑通 + 占位 R10) — 见 changelog
 - **V4-1a**(13 commit / 6 轮 bug): B asset 表格 + 段落样式 + 字体 + 字号 + cell 字号 真修 — 见 changelog V4-1 entry
 - **V4-skel**(10 commit): V4-2b/V4-1b/V4-7 结构层补全 + 占位喊话地图 — 见 changelog V4-skel entry + plans/v4-structure-completion.md §4.5(静态占位点清单)
+- **V4-7a**(3 commit + 1 子 fix): 合并器浅做接 master 规范(font + cell sz 两维 done)— 见 changelog V4-7a entry + plans/v4-7a.md;V4-7b 深(run-level normalize + section + 页码)仍占位押后
 
 ---
 

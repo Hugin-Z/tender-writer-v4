@@ -51,6 +51,7 @@ paths:
   - 'scripts/tests/_r10_report.md'                           # gitignored: docs/v4_backlog.md 引用 R10 报告自身, 物理存在但 .gitignored
   - 'projects/tender-writer/ISC.md'                          # historical_plan: plans/v4-3.md:28 V4-2a Phase 3 ack 的 handbook 仓未建文件
   - 'scripts/tests/fixtures/v45_merge/brief_c_attachment_skip.json'  # historical_plan: plans/v4-4.md:24 V4-2a Phase 3 ack 的 fixture rename FROM 名
+  - 'plans/v4-7a.md'                                          # future_file: V4-7a.3 待入仓 plan, _write_merge_normalize_log 头注引用
 
 constants:
   # ── F 类 · 历史佐证字面 (commit 4 / 6a 引入, 保留作 "迁移记录") ──

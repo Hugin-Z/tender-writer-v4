@@ -1,5 +1,19 @@
 # tender-writer 变更日志
 
+## V4-7a · 2026-06 · 合并器浅做接 master 规范(font + cell sz 两维 done / 列宽+section+页码三维占位 V4-7b)
+
+V4-7 拆 V4-7a(浅做/本次)+ V4-7b(深/占位押后)。V4-7a 在合并器 `_post_merge_normalize` hook 内接 master 规范一次 apply,解 docxcompose「后到优先」导致 anchor 自带 styles 覆盖 master 的两个确定问题(合并产物 Heading 蓝色 + 表格 cell 字号回归)—— 这两个不是假设问题,是 docxcompose 合并策略必然导致、跑真实标就会看到的。浅做成本极低(~30 行、复用 V4-1a 现成 helper、0 新 OXML 操作)。
+
+- **font_normalize done(style-level)**:`composer.save` 前调 `apply_default_styles(final_doc)`,把 anchor 自带 Heading2 蓝色 `4F81BD` 压回 master `000000` 黑,Normal/字体/Heading 字号统一。仅 style 层有效,run-level direct 格式不剥(留 V4-7b)。
+- **table_cell_size done**:整篇 doc 内所有 `<w:tbl>` cell run 强 set `sz/szCs=24`(12pt),复用 V4-1a.12 `_apply_table_cell_size_to_runs`,scope 从单 part 扩到整篇,落回 V4-1a 表格小一号约定。
+- **V4-7b 押后 3 维**:`table_width_unify` / `section_break` / `page_number_reset` 仍 noop。`merge_normalize.log` 五维诚实摊开,头注明示「V4-7a 完成 2 维 / V4-7b 押后 3 维」,不把"做了两维"说成"V4-7 完成"。
+- **验生效**(沿 V4-1a 教训):case_9 验合并产物 OXML 字段值(Heading2 color=000000 / cell run sz=24 / Normal sz=28),不只验调了 apply。
+- **log 字段名精准对齐行为(R10)**:`table_width_unify` 独立标 `noop`(V4-7a 不做列宽,列宽统一是 V4-7b),新增 `table_cell_size` 维标 `done` —— 不沿用「`table_width_unify: done (cell sz only)`」那种字段名误导(机器读 key 不读括号说明)。
+
+V4-7b 深(per-run normalize 整篇 + section + 页码)留实现层,待真实多 Part 合并产物驱动,与 V4-1a 同量级 cost,且做不做取决于 V4-7a 浅做完视觉够不够。
+
+---
+
 ## V4-skel · 2026-06 · 三待办结构层补全(占位喊话地图)
 
 把 V4 剩余三待办(V4-2b / V4-1b / V4-7)做到结构层 —— 字段、接口、调用链、占位接住,让完整跑一次能全程不断流;实现层留待真实输入暴露后再修。**核心交付不是代码骨架本身,而是一张"哪里真 / 哪里占位"的地图**:每个占位都自己喊出"我是占位、实线未做、看某 sidecar",完整跑时铺成产物里的占位标记,Hugin 据此一次性定三待办的实线该怎么填。
