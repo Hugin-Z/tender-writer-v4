@@ -1,0 +1,41 @@
+{
+  "generated_at": "2026-04-24T12:25:03+08:00",
+  "project": "demo_cadre_training",
+  "coverage_pct": 100.0,
+  "coverage_total": 5,
+  "coverage_explicit": 5,
+  "coverage_weak": 0,
+  "coverage_missing": 0,
+  "star_total": 0,
+  "star_explicit": 0,
+  "star_unclear": 0,
+  "triangle_total": 0,
+  "triangle_explicit": 0,
+  "triangle_unclear": 0,
+  "template_residue_count": 0,
+  "template_residue_items": [],
+  "format_issues_count": 1,
+  "format_issues_items": [
+    "missing 目录 keywords: 目录"
+  ],
+  "title_keyword_coverage_pct": 100.0,
+  "title_keyword_hit": 5,
+  "title_keyword_total": 5,
+  "mandatory_element_coverage_pct": 94.7,
+  "mandatory_element_total": 41,
+  "mandatory_element_hit": 39,
+  "mandatory_element_missed_items": [
+    {
+      "item": "保障措施(12分)",
+      "missed": [
+        "有效性"
+      ]
+    },
+    {
+      "item": "服务承诺(8分)",
+      "missed": [
+        "12个月"
+      ]
+    }
+  ]
+}

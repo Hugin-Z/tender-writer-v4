@@ -1,0 +1,62 @@
+{
+  "part_name": "投标文件封面",
+  "blocks": [
+    {
+      "type": "text",
+      "content": "A 市直属单位 2026 年度干部综合能力提升培训服务采购项目\n\n"
+    },
+    {
+      "type": "text",
+      "content": "响应文件\n\n"
+    },
+    {
+      "type": "text",
+      "content": "项目编号:DEMO-2026-001\n\n"
+    },
+    {
+      "type": "text",
+      "content": "供应商:"
+    },
+    {
+      "type": "variable",
+      "name": "bidder_name",
+      "description": "投标人全称(电子签章)",
+      "suggested_source": "companies",
+      "suggested_path": "own_demo.name"
+    },
+    {
+      "type": "text",
+      "content": " (电子签章)\n\n"
+    },
+    {
+      "type": "text",
+      "content": "法定代表人:"
+    },
+    {
+      "type": "variable",
+      "name": "legal_representative",
+      "description": "法代(电子签名)",
+      "suggested_source": "companies",
+      "suggested_path": "own_demo.legal_representative"
+    },
+    {
+      "type": "text",
+      "content": " (电子签名)\n\n"
+    },
+    {
+      "type": "text",
+      "content": "日期:"
+    },
+    {
+      "type": "variable",
+      "name": "submit_date",
+      "description": "提交日期",
+      "suggested_source": "manual",
+      "suggested_path": ""
+    },
+    {
+      "type": "text",
+      "content": "\n"
+    }
+  ]
+}

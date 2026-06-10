@@ -1,0 +1,69 @@
+{
+  "part_name": "开标一览表",
+  "blocks": [
+    {
+      "type": "text",
+      "content": "(一)开标一览表\n\n"
+    },
+    {
+      "type": "text",
+      "content": "项目编号:DEMO-2026-001\n"
+    },
+    {
+      "type": "text",
+      "content": "项目名称:A 市直属单位 2026 年度干部综合能力提升培训服务采购项目\n\n"
+    },
+    {
+      "type": "text",
+      "content": "投标报价(小写):"
+    },
+    {
+      "type": "variable",
+      "name": "bid_price_numeric",
+      "description": "投标报价(阿拉伯数字,不超过500000元)",
+      "suggested_source": "manual",
+      "suggested_path": ""
+    },
+    {
+      "type": "text",
+      "content": " 元\n投标报价(大写):"
+    },
+    {
+      "type": "variable",
+      "name": "bid_price_chinese",
+      "description": "投标报价(人民币大写)",
+      "suggested_source": "manual",
+      "suggested_path": ""
+    },
+    {
+      "type": "text",
+      "content": "\n服务期限:60日历日\n\n"
+    },
+    {
+      "type": "text",
+      "content": "供应商(电子签章):"
+    },
+    {
+      "type": "variable",
+      "name": "bidder_name",
+      "description": "投标人全称",
+      "suggested_source": "companies",
+      "suggested_path": "own_demo.name"
+    },
+    {
+      "type": "text",
+      "content": "\n日期:"
+    },
+    {
+      "type": "variable",
+      "name": "submit_date",
+      "description": "日期",
+      "suggested_source": "manual",
+      "suggested_path": ""
+    },
+    {
+      "type": "text",
+      "content": "\n"
+    }
+  ]
+}

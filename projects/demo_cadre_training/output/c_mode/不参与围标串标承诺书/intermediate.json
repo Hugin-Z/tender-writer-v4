@@ -1,0 +1,61 @@
+{
+  "part_name": "不参与围标串标承诺书",
+  "blocks": [
+    {
+      "type": "text",
+      "content": "(四)不参与围标串标承诺书\n\n本人作为 "
+    },
+    {
+      "type": "variable",
+      "name": "bidder_name",
+      "description": "投标人全称",
+      "suggested_source": "companies",
+      "suggested_path": "own_demo.name"
+    },
+    {
+      "type": "text",
+      "content": " 的法人,承诺本项目投标活动不存在围标串标行为。\n\n"
+    },
+    {
+      "type": "text",
+      "content": "项目编号:DEMO-2026-001\n\n"
+    },
+    {
+      "type": "text",
+      "content": "供应商(电子签章):"
+    },
+    {
+      "type": "variable",
+      "name": "bidder_name_2",
+      "description": "投标人全称",
+      "suggested_source": "companies",
+      "suggested_path": "own_demo.name"
+    },
+    {
+      "type": "text",
+      "content": "\n法定代表人(电子签名):"
+    },
+    {
+      "type": "variable",
+      "name": "legal_representative",
+      "description": "法代",
+      "suggested_source": "companies",
+      "suggested_path": "own_demo.legal_representative"
+    },
+    {
+      "type": "text",
+      "content": "\n日期:"
+    },
+    {
+      "type": "variable",
+      "name": "submit_date",
+      "description": "日期",
+      "suggested_source": "manual",
+      "suggested_path": ""
+    },
+    {
+      "type": "text",
+      "content": "\n"
+    }
+  ]
+}

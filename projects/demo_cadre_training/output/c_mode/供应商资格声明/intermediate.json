@@ -1,0 +1,112 @@
+{
+  "part_name": "供应商资格声明",
+  "blocks": [
+    {
+      "type": "text",
+      "content": "(一)供应商资格声明\n\n投标人名称:"
+    },
+    {
+      "type": "variable",
+      "name": "bidder_name",
+      "description": "投标人全称",
+      "suggested_source": "companies",
+      "suggested_path": "own_demo.name"
+    },
+    {
+      "type": "text",
+      "content": "\n营业执照注册号:"
+    },
+    {
+      "type": "variable",
+      "name": "business_license_no",
+      "description": "统一社会信用代码",
+      "suggested_source": "companies",
+      "suggested_path": "own_demo.business_license_no"
+    },
+    {
+      "type": "text",
+      "content": "\n注册资金:"
+    },
+    {
+      "type": "variable",
+      "name": "registered_capital",
+      "description": "注册资金",
+      "suggested_source": "companies",
+      "suggested_path": "own_demo.registered_capital"
+    },
+    {
+      "type": "text",
+      "content": "  邮政编码:"
+    },
+    {
+      "type": "variable",
+      "name": "postal_code",
+      "description": "邮编",
+      "suggested_source": "companies",
+      "suggested_path": "own_demo.postal_code"
+    },
+    {
+      "type": "text",
+      "content": "\n成立日期:"
+    },
+    {
+      "type": "variable",
+      "name": "established_date",
+      "description": "成立日期",
+      "suggested_source": "companies",
+      "suggested_path": "own_demo.established_date"
+    },
+    {
+      "type": "text",
+      "content": "\n地址:"
+    },
+    {
+      "type": "variable",
+      "name": "address",
+      "description": "注册地址",
+      "suggested_source": "companies",
+      "suggested_path": "own_demo.address"
+    },
+    {
+      "type": "text",
+      "content": "\n经营范围:"
+    },
+    {
+      "type": "variable",
+      "name": "business_scope",
+      "description": "经营范围",
+      "suggested_source": "manual",
+      "suggested_path": ""
+    },
+    {
+      "type": "text",
+      "content": "\n\n声明:本公司具备并满足《政府采购法》第二十二条的全部规定。\n\n"
+    },
+    {
+      "type": "text",
+      "content": "供应商(电子签章):"
+    },
+    {
+      "type": "variable",
+      "name": "bidder_name_2",
+      "description": "投标人全称",
+      "suggested_source": "companies",
+      "suggested_path": "own_demo.name"
+    },
+    {
+      "type": "text",
+      "content": "\n日期:"
+    },
+    {
+      "type": "variable",
+      "name": "submit_date",
+      "description": "日期",
+      "suggested_source": "manual",
+      "suggested_path": ""
+    },
+    {
+      "type": "text",
+      "content": "\n"
+    }
+  ]
+}

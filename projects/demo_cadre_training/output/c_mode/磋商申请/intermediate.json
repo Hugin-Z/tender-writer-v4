@@ -1,0 +1,69 @@
+{
+  "part_name": "磋商申请",
+  "blocks": [
+    {
+      "type": "text",
+      "content": "(一)磋商申请\n\n致:A 市机关事务服务中心\n\n"
+    },
+    {
+      "type": "text",
+      "content": "根据贵方项目编号 DEMO-2026-001 的磋商文件,我方正式提交响应文件。\n"
+    },
+    {
+      "type": "text",
+      "content": "总报价为(大写)"
+    },
+    {
+      "type": "variable",
+      "name": "bid_price_chinese",
+      "description": "投标报价(大写)",
+      "suggested_source": "manual",
+      "suggested_path": ""
+    },
+    {
+      "type": "text",
+      "content": " 元人民币。\n"
+    },
+    {
+      "type": "text",
+      "content": "我方指派 "
+    },
+    {
+      "type": "variable",
+      "name": "project_manager",
+      "description": "项目负责人姓名",
+      "suggested_source": "manual",
+      "suggested_path": ""
+    },
+    {
+      "type": "text",
+      "content": " 为项目负责人。\n\n"
+    },
+    {
+      "type": "text",
+      "content": "供应商(电子签章):"
+    },
+    {
+      "type": "variable",
+      "name": "bidder_name",
+      "description": "投标人全称",
+      "suggested_source": "companies",
+      "suggested_path": "own_demo.name"
+    },
+    {
+      "type": "text",
+      "content": "\n日期:"
+    },
+    {
+      "type": "variable",
+      "name": "submit_date",
+      "description": "日期",
+      "suggested_source": "manual",
+      "suggested_path": ""
+    },
+    {
+      "type": "text",
+      "content": "\n"
+    }
+  ]
+}

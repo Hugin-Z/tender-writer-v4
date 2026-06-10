@@ -1,0 +1,27 @@
+template_name: 开标一览表
+part_index: 5
+part_name: 开标一览表
+source_lines:
+- 98
+- 105
+variables:
+- name: bid_price_numeric
+  description: 投标报价(阿拉伯数字,不超过500000元)
+  source: manual
+  path: ''
+  required: true
+- name: bid_price_chinese
+  description: 投标报价(人民币大写)
+  source: manual
+  path: ''
+  required: true
+- name: bidder_name
+  description: 投标人全称
+  source: companies
+  path: own_demo.name
+  required: true
+- name: submit_date
+  description: 日期
+  source: manual
+  path: ''
+  required: true

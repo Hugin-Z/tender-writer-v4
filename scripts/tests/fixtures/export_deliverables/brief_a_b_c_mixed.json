@@ -1,0 +1,37 @@
+{
+  "response_file_parts": [
+    {
+      "name": "技术方案",
+      "production_mode": "A",
+      "order": 1
+    },
+    {
+      "name": "业绩证明",
+      "production_mode": "B",
+      "order": 2
+    },
+    {
+      "name": "格式响应",
+      "production_mode": "C",
+      "sub_mode": "C-template",
+      "order": 3
+    },
+    {
+      "name": "操作说明",
+      "production_mode": "C",
+      "sub_mode": "C-reference",
+      "order": 4
+    },
+    {
+      "name": "挂档资料",
+      "production_mode": "C",
+      "sub_mode": "C-attachment",
+      "order": 5
+    },
+    {
+      "name": "外部信息",
+      "production_mode": "D",
+      "order": 6
+    }
+  ]
+}

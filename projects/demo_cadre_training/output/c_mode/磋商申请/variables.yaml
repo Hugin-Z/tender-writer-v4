@@ -1,0 +1,27 @@
+template_name: 磋商申请
+part_index: 6
+part_name: 磋商申请
+source_lines:
+- 106
+- 110
+variables:
+- name: bid_price_chinese
+  description: 投标报价(大写)
+  source: manual
+  path: ''
+  required: true
+- name: project_manager
+  description: 项目负责人姓名
+  source: manual
+  path: ''
+  required: true
+- name: bidder_name
+  description: 投标人全称
+  source: companies
+  path: own_demo.name
+  required: true
+- name: submit_date
+  description: 日期
+  source: manual
+  path: ''
+  required: true

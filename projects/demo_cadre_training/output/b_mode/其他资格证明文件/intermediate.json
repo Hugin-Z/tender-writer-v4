@@ -1,0 +1,67 @@
+{
+  "part_name": "其他资格证明文件",
+  "assembly_order": [
+    {
+      "section_id": "(一)",
+      "section_title": "营业执照",
+      "asset_type": "资质证书",
+      "source_type": "asset_lookup",
+      "source": "申请人资格要求 3:营业执照",
+      "items": [
+        "营业执照扫描件(统一社会信用代码)"
+      ],
+      "format": "扫描件加盖投标人公章",
+      "asset_query": {
+        "type": "资质",
+        "name": "营业执照"
+      }
+    },
+    {
+      "section_id": "(二)",
+      "section_title": "财务审计报告",
+      "asset_type": "财务报告",
+      "source_type": "asset_lookup",
+      "source": "申请人资格要求 4:商业信誉和财务会计制度",
+      "items": [
+        "2024 或 2025 年度财务审计报告"
+      ],
+      "format": "扫描件加盖投标人公章",
+      "asset_query": {
+        "type": "资质",
+        "name": "财务审计报告"
+      }
+    },
+    {
+      "section_id": "(三)",
+      "section_title": "税务/社保证明",
+      "asset_type": "缴税社保证明",
+      "source_type": "asset_lookup",
+      "source": "申请人资格要求 6:依法缴纳税收和社会保障资金",
+      "items": [
+        "近半年任意一个月完税证明 + 社保缴纳证明"
+      ],
+      "format": "扫描件加盖投标人公章",
+      "asset_query": {
+        "type": "资质",
+        "name": "完税社保证明"
+      }
+    },
+    {
+      "section_id": "(四)",
+      "section_title": "中小企业声明函",
+      "asset_type": "声明函",
+      "source_type": "inline_template",
+      "source": "申请人资格要求 2:供应商为中小微企业;配套财库[2020]46 号《政府采购促进中小企业发展管理办法》",
+      "items": [
+        "单位名称",
+        "项目名称:A 市直属单位 2026 年度干部综合能力提升培训服务采购项目",
+        "标的名称(所投服务):干部综合能力提升培训服务",
+        "所属行业:其他未列明行业",
+        "企业名称 / 从业人员 / 年营业收入 / 资产总额",
+        "企业规模类别(中型/小型/微型)",
+        "加盖电子签章 + 日期"
+      ],
+      "format": "固定模板 + 变量(企业规模等),c_mode 模板填充能力可复用;本 Part 以 inline_template 方式占位,由投标方按真实企业数据填充"
+    }
+  ]
+}

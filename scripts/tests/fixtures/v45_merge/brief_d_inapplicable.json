@@ -1,0 +1,16 @@
+{
+  "response_file_parts": [
+    {
+      "name": "外部信息采集",
+      "production_mode": "D"
+    },
+    {
+      "name": "无模式声明",
+      "production_mode": ""
+    },
+    {
+      "name": "未识别模式",
+      "production_mode": "Z"
+    }
+  ]
+}

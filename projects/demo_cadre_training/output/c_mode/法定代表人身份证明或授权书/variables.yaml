@@ -1,0 +1,42 @@
+template_name: 法定代表人身份证明或授权书
+part_index: 2
+part_name: 法定代表人身份证明或授权书
+source_lines:
+- 86
+- 91
+variables:
+- name: bidder_name
+  description: 投标人全称
+  source: companies
+  path: own_demo.name
+  required: true
+- name: legal_representative
+  description: 法代姓名
+  source: companies
+  path: own_demo.legal_representative
+  required: true
+- name: legal_representative_gender
+  description: 法代性别
+  source: companies
+  path: own_demo.legal_representative_gender
+  required: true
+- name: legal_representative_title
+  description: 法代职务
+  source: companies
+  path: own_demo.legal_representative_title
+  required: true
+- name: bidder_name_2
+  description: 投标人全称
+  source: companies
+  path: own_demo.name
+  required: true
+- name: bidder_name_3
+  description: 投标人全称
+  source: companies
+  path: own_demo.name
+  required: true
+- name: submit_date
+  description: 日期
+  source: manual
+  path: ''
+  required: true

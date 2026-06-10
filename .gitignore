@@ -1,0 +1,81 @@
+# Python
+.venv/
+venv/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# OS
+.DS_Store
+Thumbs.db
+*.swp
+*~
+
+# Microsoft Office / WPS 打开 docx/xlsx 时的临时锁文件
+~$*
+
+# Editor / IDE
+.vscode/
+.idea/
+
+# R10 扫描脚本本地产物 (每次运行重写, 不入仓)
+scripts/tests/_r10_report.md
+*.sublime-project
+*.sublime-workspace
+
+# Claude Code 本地配置(含机器绝对路径)
+.claude/
+
+# Logs
+*.log
+
+# 用户 review 闸门标记(运行时产物,不入版本控制;首次跑 demo 时由用户 touch 产生)
+*.reviewed
+
+# 临时测试产物
+/tmp/
+*.tmp
+*.bak
+
+# _inbox_unsorted 下的真实素材(保留 .md 文档和 .gitkeep 占位,其他一律忽略)
+_inbox_unsorted/*
+!_inbox_unsorted/README.md
+!_inbox_unsorted/.gitkeep
+!_inbox_unsorted/_raw/
+_inbox_unsorted/_raw/*
+!_inbox_unsorted/_raw/.gitkeep
+
+# assets 下每个公司的 _inbox 和 _raw 原始素材(只保留 .gitkeep 占位)
+assets/**/_inbox/*
+!assets/**/_inbox/.gitkeep
+assets/**/_raw/*
+!assets/**/_raw/.gitkeep
+# V3-1 例外:own_* 公司下 demo_ 标识 fixture 入库(供 b_mode_fill demo 验证),
+# 真实 partner_* / ref_* 公司的 _raw 仍受隐私保护
+!assets/**/own_*/_raw/*demo*.docx
+
+# 素材摄入去重记录(运行时产物)
+assets/.ingest_history.json
+
+# 真实项目目录默认不入库(保护客户招标文件、投标产物)
+# demo 是例外,保留入库供公开演示
+projects/*/input/
+projects/*/output/
+projects/*/final_tender_package/
+projects/*/投标交付物/
+!projects/demo_cadre_training/
+!projects/demo_cadre_training/**
+
+# demo 白名单是为了让 demo_cadre_training 的 output/input/final_tender_package/投标交付物
+# 入 git 作为公开演示。但 .reviewed 闸门文件是例外:即使在 demo 里也不入 git,
+# 确保所有用户(包括 clone demo 跑一遍的)都经历一次手动 touch 的演练,
+# 对齐 CLAUDE.md 红线 1"AI 不得代建用户闸门文件"。
+# gitignore 最后匹配规则生效,此行覆盖上方白名单对 .reviewed 的放行。
+projects/demo_cadre_training/**/*.reviewed
+
+# raw.txt 是 b_mode_extract / c_mode_extract 跑 demo 时产生的中间产物
+# (extract 阶段从 PDF/docx 抽出的纯文本),不应入 git。
+# 同样作为 demo 白名单的覆盖规则。
+projects/*/output/b_mode/*/raw.txt
+projects/*/output/c_mode/*/raw.txt

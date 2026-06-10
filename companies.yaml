@@ -1,0 +1,78 @@
+# 公司注册表(集中事实来源)
+# 所有涉及的公司在此注册,其他地方(assets/、knowledge_base/)通过 id 引用。
+#
+# 【硬性规则】
+# 1. 不要手工编辑此文件,通过 Claude Code / Cline 触发"新增公司"工作流
+#    (AI 助手会调用 run_script.bat add_company.py 脚本自动维护)
+# 2. reference 类型公司的具体业绩/资质/人员【绝不】进入标书正文
+#    reference 类型公司的材料【绝不】进入 assets/ 目录,只能进 references/knowledge_base/
+# 3. 首次使用前,请把 own_default 替换为您的真实公司信息
+#    (或走"新增公司"工作流注册一个真实 own 主体,并在 Step 0 "投标主体选择"时选中)
+#
+# id 命名规则:
+#   - own 类型:      own_<拼音/英文缩写>    (如 own_default、own_demo)
+#   - partner 类型:  partner_<拼音/英文缩写>(如 partner_example)
+#   - reference 类型:ref_<拼音/英文缩写>   (如 ref_example)
+#
+# type 字段含义:
+#   - own:       我方主体,材料可直接引用进标书
+#   - partner:   合作方/联合体/分包方,材料可引用但必须标注来源
+#   - reference: 竞品/行业标杆/公开案例,严禁直接引用进标书,只能作为学习参考
+
+companies:
+  - id: own_default
+    name: "【待配置-请改为我方实际公司全称】"
+    type: own
+    status: placeholder  # 占位条目,使用前必须替换为真实公司
+    description: "【待配置】首次使用本工具前,请通过新增公司工作流注册您的真实公司主体,或直接修改本占位条目。"
+    aliases: []
+    created_at: 2026-04-23
+    # C 模式模板填充所需字段(未配置时 filled.docx 会留"【待填:xxx】"红色占位)
+    legal_representative: __PENDING_USER__
+    address: __PENDING_USER__
+    phone: __PENDING_USER__
+    email: __PENDING_USER__
+    fax: __PENDING_USER__
+    postal_code: __PENDING_USER__
+    business_license_no: __PENDING_USER__
+    registered_capital: __PENDING_USER__
+    # 法定代表人身份证明 Part 所需字段
+    company_type: __PENDING_USER__
+    established_date: __PENDING_USER__
+    business_period: __PENDING_USER__
+    legal_representative_gender: __PENDING_USER__
+    legal_representative_title: __PENDING_USER__
+
+  - id: own_demo
+    name: 示例科技有限公司
+    type: own
+    description: "虚构演示公司,首次试用者参考用;正式使用前请替换或新增真实公司条目"
+    aliases: [示例科技]
+    created_at: 2026-04-23
+    legal_representative: __PENDING_USER__
+    address: __PENDING_USER__
+    phone: __PENDING_USER__
+    email: __PENDING_USER__
+    fax: __PENDING_USER__
+    postal_code: __PENDING_USER__
+    business_license_no: __PENDING_USER__
+    registered_capital: __PENDING_USER__
+    company_type: __PENDING_USER__
+    established_date: __PENDING_USER__
+    business_period: __PENDING_USER__
+    legal_representative_gender: __PENDING_USER__
+    legal_representative_title: __PENDING_USER__
+
+  - id: partner_example
+    name: 合作伙伴咨询有限公司
+    type: partner
+    description: "虚构演示合作伙伴;联合体/分包场景下的素材必须在文中标注来源"
+    aliases: []
+    created_at: 2026-04-23
+
+  - id: ref_example
+    name: 参考案例建设集团
+    type: reference
+    description: "虚构演示竞品/参考标杆;绝不将其业绩/资质/人员写入标书正文,只能作为结构/话术的学习参考"
+    aliases: []
+    created_at: 2026-04-23

@@ -1,0 +1,59 @@
+# R10 扫描 allow-list (V4-0.2)
+#
+# 列出已知合法但会被扫描误报的引用. 维护原则:
+# - 必须显式标注理由
+# - 占位/示例性引用 (含 {} 或仅作示例) 用 paths 字段
+# - 跨仓引用 / 已知虚指放 paths
+# - 字面常量已 known-stale 但保留作历史佐证, 放 constants
+# - 同文件自指允许, 用 self_ref_files
+#
+# pattern 支持 * 通配 (简单 glob, 非 regex)
+
+paths:
+  # 占位用法 / 文档示例性引用
+  - 'projects/{项目}/*'
+  - 'projects/{项目名}/*'
+  - 'templates/{*'                          # templates/{类别}/ 占位
+  - 'assets/{*'                             # assets/{类别}/{company_id}/
+  - 'projects/<*'                           # SKILL.md 用 <项目> 占位
+  # 跨仓引用 (chat 端 audit / handbook 等不在本仓内)
+  - 'handbook/*'
+  - '../handbook/*'
+  # ── C 类 · 历史/未来引用 (v6b 单条登记, 不脑补) ──
+  - 'projects/v2_docx_mock/*'                                # docs/v2_roadmap.md:66 "若未来引入需新建" 显式未来占位
+  - 'assets/own_default/_curated/*'                          # plans/v3-1.md 历史 V3-1 设计期举例 (现 _curated 目录约定已变)
+  - 'assets/公司资质/own_default/_generators/*'              # plans/v3-1.md L339 历史举例 (现路径布局已变)
+  - 'references/asset_type_mapping.md'                       # plans/v3-1.md L52 历史问句句, 现该文件不存在
+  - 'references/knowledge_base/*'                            # tmp/audit_report.md L47 knowledge base schema 占位
+  - 'plans/audit_report.md/*'                                # tmp/audit_c_batch2_report.md L229 句末 plans/audit_report.md/changelog 是反斜杠拼接误读
+  # ── E 类 · 用户机器路径 / 测试材料 (fixture README 教用户复刻) ──
+  - 'projects/test/input/*'                                  # plans/v3-6.md L258 + fixtures/parse_tender/_generators 教用户从原文 PDF 复刻
+  - 'projects/demo/*'                                        # scripts/tests/test_compliance_check.py:157 测试材料路径 (注意: 不是 demo_cadre_training)
+  - 'projects/real_nonexistent/*'                            # scripts/tests/test_r10_consistency_check.py 故意构造不存在路径验证扫描器
+  - 'docs/nonexistent_path.md'                               # 同上, 故意构造
+
+constants:
+  # ── F 类 · 历史佐证字面 (commit 4 / 6a 引入, 保留作 "迁移记录") ──
+  - 'brief_schema.SUB_MODE_JUDGE_PROMPT'    # SKILL.md L762: 该常量已在 v1 P2 清理删除, 迁到 business_model §8 #N20. 保留字面让维护者知道历史 (commit 4)
+  - 'brief_schema.B_MODE_EXTRACT_PROMPT'    # b_mode_extract.py L105: 同上, 迁到 business_model §8 #N21 (commit 6a)
+  - 'valid_module.VALID_CONST'              # scripts/tests/test_r10_consistency_check.py:87 测试用 fixture 内构造的常量, 仅在 fixture 内有效
+
+business_model_anchors:
+  # 留空 — V4-0.1 文档落地后所有引用应能命中
+  # 如未来发现已删锚点仍在历史代码引用, 在此白名单
+
+self_ref_files:
+  # 这些文件内部自指本身合法 (例如 SKILL.md 写 "见 SKILL.md 阶段 X")
+  - SKILL.md
+  - README.md
+  - CLAUDE.md
+  - docs/changelog.md
+  - docs/DESIGN.md
+  - docs/FAQ.md
+  - docs/manifest_schema.md
+  - docs/v2_design_notes.md
+  - docs/v2_roadmap.md
+  - docs/v3_planning.md
+  - docs/business_model_v1.md
+  - templates/README.md
+  - scripts/tests/README.md

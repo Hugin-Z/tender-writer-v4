@@ -1,0 +1,36 @@
+# asset_type 映射表(V3-1)
+#
+# 把 manifest.yaml assembly_order 中的 spec.asset_type / asset_query.type
+# 映射到现有 assets/ 目录的 5 类固定中文类别名,供 CuratedLocalAssetsProvider 扫描定位。
+#
+# 命中规则(在 scripts/_asset_type_mapping.py::map_asset_type_to_category):
+#   1. 精确匹配 spec.asset_type(细粒度,如 "资质证书")
+#   2. 回退匹配 asset_query.type(粗粒度,如 "资质")
+#   3. 兜底返回 fallback(默认 "__placeholder__",CuratedLocalAssetsProvider 见此返回 placeholder AssetRef + 日志告警)
+#
+# 新增 asset_type 时只需在 mappings 下加一行,无需改代码。
+# 5 类固定类别(对应 assets/ 顶层子目录):
+#   公司资质 / 团队简历 / 标准话术 / 类似业绩 / 通用图表
+
+mappings:
+  # === 精确匹配:b_mode_extract 产出的 spec.asset_type ===
+  资质证书: 公司资质
+  财务报告: 公司资质
+  缴税社保证明: 公司资质
+  营业执照: 公司资质
+  团队简历: 团队简历
+  人员简历: 团队简历
+  业绩清单: 类似业绩
+  类似业绩: 类似业绩
+  声明函: 标准话术
+  组织架构图: 通用图表
+
+  # === 回退匹配:asset_query.type 粗粒度兜底 ===
+  资质: 公司资质
+  简历: 团队简历
+  业绩: 类似业绩
+  话术: 标准话术
+  图表: 通用图表
+
+# 未命中时返回此值。CuratedLocalAssetsProvider 不抛异常,产出 placeholder AssetRef + 日志告警。
+fallback: __placeholder__

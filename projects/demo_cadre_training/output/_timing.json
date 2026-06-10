@@ -1,0 +1,84 @@
+{
+  "entries": [
+    {
+      "stage": "parse_tender",
+      "started_at": "2026-04-28T14:53:38",
+      "ended_at": "2026-04-28T14:53:39",
+      "duration_seconds": 0.242,
+      "success": true,
+      "error": ""
+    },
+    {
+      "stage": "build_scoring_matrix",
+      "started_at": "2026-04-28T14:53:39",
+      "ended_at": "2026-04-28T14:53:39",
+      "duration_seconds": 0.004,
+      "success": true,
+      "error": ""
+    },
+    {
+      "stage": "generate_outline",
+      "started_at": "2026-04-28T14:53:40",
+      "ended_at": "2026-04-28T14:53:40",
+      "duration_seconds": 0.012,
+      "success": true,
+      "error": ""
+    },
+    {
+      "stage": "c_mode_run",
+      "started_at": "2026-04-28T14:53:40",
+      "ended_at": "2026-04-28T14:53:44",
+      "duration_seconds": 4.561,
+      "success": true,
+      "error": ""
+    },
+    {
+      "stage": "b_mode_extract",
+      "started_at": "2026-04-28T14:53:45",
+      "ended_at": "2026-04-28T14:53:45",
+      "duration_seconds": 0.016,
+      "success": true,
+      "error": ""
+    },
+    {
+      "stage": "b_mode_fill",
+      "started_at": "2026-04-28T14:53:45",
+      "ended_at": "2026-04-28T14:53:46",
+      "duration_seconds": 0.154,
+      "success": true,
+      "error": ""
+    },
+    {
+      "stage": "v45_merge",
+      "started_at": "2026-04-28T14:53:46",
+      "ended_at": "2026-04-28T14:53:50",
+      "duration_seconds": 3.289,
+      "success": true,
+      "error": ""
+    },
+    {
+      "stage": "check_cross_consistency",
+      "started_at": "2026-04-28T14:53:50",
+      "ended_at": "2026-04-28T14:53:50",
+      "duration_seconds": 0.059,
+      "success": true,
+      "error": ""
+    },
+    {
+      "stage": "compliance_check",
+      "started_at": "2026-04-28T14:53:51",
+      "ended_at": "2026-04-28T14:53:51",
+      "duration_seconds": 0.366,
+      "success": true,
+      "error": ""
+    },
+    {
+      "stage": "export_deliverables",
+      "started_at": "2026-04-28T14:53:52",
+      "ended_at": "2026-04-28T14:53:52",
+      "duration_seconds": 0.005,
+      "success": true,
+      "error": ""
+    }
+  ]
+}

@@ -1,0 +1,27 @@
+template_name: 不参与围标串标承诺书
+part_index: 4
+part_name: 不参与围标串标承诺书
+source_lines:
+- 93
+- 97
+variables:
+- name: bidder_name
+  description: 投标人全称
+  source: companies
+  path: own_demo.name
+  required: true
+- name: bidder_name_2
+  description: 投标人全称
+  source: companies
+  path: own_demo.name
+  required: true
+- name: legal_representative
+  description: 法代
+  source: companies
+  path: own_demo.legal_representative
+  required: true
+- name: submit_date
+  description: 日期
+  source: manual
+  path: ''
+  required: true

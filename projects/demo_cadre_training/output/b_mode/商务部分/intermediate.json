@@ -1,0 +1,34 @@
+{
+  "part_name": "商务部分",
+  "assembly_order": [
+    {
+      "section_id": "(一)",
+      "section_title": "投标人类似项目业绩清单",
+      "asset_type": "业绩清单",
+      "source_type": "inline_template",
+      "source": "第六章商务部分:近3年类似培训服务业绩",
+      "items": [
+        "业绩1:项目名称/采购人/服务内容/合同金额/实施时间",
+        "业绩2:项目名称/采购人/服务内容/合同金额/实施时间"
+      ],
+      "format": "表格 + 每业绩附合同/中标通知书扫描件"
+    },
+    {
+      "section_id": "(二)",
+      "section_title": "团队成员名单与简历",
+      "asset_type": "团队简历",
+      "source_type": "asset_lookup",
+      "source": "第六章商务部分:团队成员名单、资质证明",
+      "items": [
+        "团队成员名单表(角色/姓名/职称/相关经验)",
+        "主讲教师简历 + 教学经历 + 职称证书",
+        "外聘专家履历"
+      ],
+      "format": "每份简历 + 证明文件扫描件加盖投标人公章",
+      "asset_query": {
+        "type": "简历",
+        "name": "团队成员简历"
+      }
+    }
+  ]
+}

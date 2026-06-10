@@ -1,0 +1,15 @@
+{
+  "extracted": {
+    "project_name": "测试演示项目 2026 年度技术服务采购",
+    "project_number": "TEST-2026-001",
+    "buyer_name": "测试采购方",
+    "buyer_agency_name": "测试代理公司",
+    "budget": "500000元",
+    "duration": "合同签订后60日内完成",
+    "procurement_method": "竞争性磋商",
+    "bidding_entity": "test_demo"
+  },
+  "response_file_parts": [],
+  "section_anchors": [],
+  "tables": []
+}

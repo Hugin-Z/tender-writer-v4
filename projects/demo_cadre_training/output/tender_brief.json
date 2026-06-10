@@ -1,0 +1,1216 @@
+{
+  "source_file": "projects\\demo_cadre_training\\input\\tender_demo.docx",
+  "char_count": 2891,
+  "raw_lines_for_ai": [
+    {
+      "line_no": 0,
+      "text": "A 市直属单位 2026 年度干部综合能力提升培训服务采购项目",
+      "length": 31,
+      "is_standalone": true,
+      "has_chapter_num": false,
+      "has_dots_leader": false
+    },
+    {
+      "line_no": 1,
+      "text": "竞争性磋商文件",
+      "length": 7,
+      "is_standalone": true,
+      "has_chapter_num": false,
+      "has_dots_leader": false
+    },
+    {
+      "line_no": 2,
+      "text": "项目编号:DEMO-2026-001",
+      "length": 18,
+      "is_standalone": true,
+      "has_chapter_num": false,
+      "has_dots_leader": false
+    },
+    {
+      "line_no": 3,
+      "text": "采购人:A 市机关事务服务中心",
+      "length": 15,
+      "is_standalone": true,
+      "has_chapter_num": false,
+      "has_dots_leader": false
+    },
+    {
+      "line_no": 4,
+      "text": "采购代理机构:示范咨询有限责任公司",
+      "length": 17,
+      "is_standalone": true,
+      "has_chapter_num": false,
+      "has_dots_leader": false
+    },
+    {
+      "line_no": 5,
+      "text": "日期:2026年10月",
+      "length": 11,
+      "is_standalone": true,
+      "has_chapter_num": false,
+      "has_dots_leader": false
+    },
+    {
+      "line_no": 6,
+      "text": "第一章 磋商公告",
+      "length": 8,
+      "is_standalone": true,
+      "has_chapter_num": true,
+      "has_dots_leader": false
+    },
+    {
+      "line_no": 7,
+      "text": "一、项目基本情况",
+      "length": 8,
+      "is_standalone": true,
+      "has_chapter_num": false,
+      "has_dots_leader": false
+    },
+    {
+      "line_no": 8,
+      "text": "项目编号:DEMO-2026-001",
+      "length": 18,
+      "is_standalone": true,
+      "has_chapter_num": false,
+      "has_dots_leader": false
+    },
+    {
+      "line_no": 9,
+      "text": "项目名称:A 市直属单位 2026 年度干部综合能力提升培训服务采购项目",
+      "length": 36,
+      "is_standalone": true,
+      "has_chapter_num": false,
+      "has_dots_leader": false
+    },
+    {
+      "line_no": 10,
+      "text": "采购方式:竞争性磋商",
+      "length": 10,
+      "is_standalone": true,
+      "has_chapter_num": false,
+      "has_dots_leader": false
+    },
+    {
+      "line_no": 11,
+      "text": "预算金额:500000元",
+      "length": 12,
+      "is_standalone": true,
+      "has_chapter_num": false,
+      "has_dots_leader": false
+    },
+    {
+      "line_no": 12,
+      "text": "最高限价:500000元",
+      "length": 12,
+      "is_standalone": true,
+      "has_chapter_num": false,
+      "has_dots_leader": false
+    },
+    {
+      "line_no": 13,
+      "text": "服务期限:合同签订后60日历日内完成全部培训与考核工作",
+      "length": 27,
+      "is_standalone": true,
+      "has_chapter_num": false,
+      "has_dots_leader": false
+    },
+    {
+      "line_no": 14,
+      "text": "交付地点:A 市机关事务服务中心指定培训基地,线上线下结合",
+      "length": 29,
+      "is_standalone": true,
+      "has_chapter_num": false,
+      "has_dots_leader": false
+    },
+    {
+      "line_no": 15,
+      "text": "本项目是否接受联合体投标:否",
+      "length": 14,
+      "is_standalone": true,
+      "has_chapter_num": false,
+      "has_dots_leader": false
+    },
+    {
+      "line_no": 16,
+      "text": "二、申请人的资格要求",
+      "length": 10,
+      "is_standalone": true,
+      "has_chapter_num": false,
+      "has_dots_leader": false
+    },
+    {
+      "line_no": 17,
+      "text": "1. 满足《中华人民共和国政府采购法》第二十二条规定。",
+      "length": 27,
+      "is_standalone": false,
+      "has_chapter_num": false,
+      "has_dots_leader": false
+    },
+    {
+      "line_no": 18,
+      "text": "2. 供应商为中小微企业或依法登记的社会培训机构。",
+      "length": 25,
+      "is_standalone": false,
+      "has_chapter_num": false,
+      "has_dots_leader": false
+    },
+    {
+      "line_no": 19,
+      "text": "3. 具有独立承担民事责任的能力,提供合法有效的营业执照。",
+      "length": 29,
+      "is_standalone": false,
+      "has_chapter_num": false,
+      "has_dots_leader": false
+    },
+    {
+      "line_no": 20,
+      "text": "4. 具有良好的商业信誉和健全的财务会计制度。",
+      "length": 23,
+      "is_standalone": false,
+      "has_chapter_num": false,
+      "has_dots_leader": false
+    },
+    {
+      "line_no": 21,
+      "text": "5. 具有承担本项目所必需的设备和专业技术能力。",
+      "length": 24,
+      "is_standalone": false,
+      "has_chapter_num": false,
+      "has_dots_leader": false
+    },
+    {
+      "line_no": 22,
+      "text": "6. 有依法缴纳税收和社会保障资金的良好记录。",
+      "length": 23,
+      "is_standalone": false,
+      "has_chapter_num": false,
+      "has_dots_leader": false
+    },
+    {
+      "line_no": 23,
+      "text": "7. 参加政府采购活动前三年内,在经营活动中没有重大违法记录。",
+      "length": 31,
+      "is_standalone": false,
+      "has_chapter_num": false,
+      "has_dots_leader": false
+    },
+    {
+      "line_no": 24,
+      "text": "三、关键时间节点",
+      "length": 8,
+      "is_standalone": true,
+      "has_chapter_num": false,
+      "has_dots_leader": false
+    },
+    {
+      "line_no": 25,
+      "text": "响应文件提交截止时间:2026年11月5日10时00分(北京时间)",
+      "length": 33,
+      "is_standalone": true,
+      "has_chapter_num": false,
+      "has_dots_leader": false
+    },
+    {
+      "line_no": 26,
+      "text": "磋商时间、地点:2026年11月5日10时00分,政采云不见面开标大厅",
+      "length": 35,
+      "is_standalone": true,
+      "has_chapter_num": false,
+      "has_dots_leader": false
+    },
+    {
+      "line_no": 27,
+      "text": "第二章 磋商须知",
+      "length": 8,
+      "is_standalone": true,
+      "has_chapter_num": true,
+      "has_dots_leader": false
+    },
+    {
+      "line_no": 28,
+      "text": "1.1 采购人:A 市机关事务服务中心",
+      "length": 19,
+      "is_standalone": true,
+      "has_chapter_num": false,
+      "has_dots_leader": false
+    },
+    {
+      "line_no": 29,
+      "text": "1.2 采购代理机构:示范咨询有限责任公司",
+      "length": 21,
+      "is_standalone": true,
+      "has_chapter_num": false,
+      "has_dots_leader": false
+    },
+    {
+      "line_no": 30,
+      "text": "2.1 报价应为固定总价报价,包含培训师资、课程开发、场地协调、教材印制、结业评估、差旅等全部费用。",
+      "length": 50,
+      "is_standalone": false,
+      "has_chapter_num": false,
+      "has_dots_leader": false
+    },
+    {
+      "line_no": 31,
+      "text": "2.2 响应文件有效期自递交截止日起90个日历日。",
+      "length": 25,
+      "is_standalone": false,
+      "has_chapter_num": false,
+      "has_dots_leader": false
+    },
+    {
+      "line_no": 32,
+      "text": "3.1 磋商保证金:人民币5000元。",
+      "length": 19,
+      "is_standalone": false,
+      "has_chapter_num": false,
+      "has_dots_leader": false
+    },
+    {
+      "line_no": 33,
+      "text": "第三章 评审方法(综合评分法)",
+      "length": 15,
+      "is_standalone": true,
+      "has_chapter_num": true,
+      "has_dots_leader": false
+    },
+    {
+      "line_no": 34,
+      "text": "采用综合评分法,总分100分。",
+      "length": 15,
+      "is_standalone": false,
+      "has_chapter_num": false,
+      "has_dots_leader": false
+    },
+    {
+      "line_no": 35,
+      "text": "一、价格部分(20 分)",
+      "length": 12,
+      "is_standalone": true,
+      "has_chapter_num": false,
+      "has_dots_leader": false
+    },
+    {
+      "line_no": 36,
+      "text": "投标报价得分=(评标基准价／投标报价)×20 分。其中评标基准价为所有有效投标报价中的最低者。",
+      "length": 47,
+      "is_standalone": false,
+      "has_chapter_num": false,
+      "has_dots_leader": false
+    },
+    {
+      "line_no": 37,
+      "text": "二、技术商务部分(80 分)",
+      "length": 14,
+      "is_standalone": true,
+      "has_chapter_num": false,
+      "has_dots_leader": false
+    },
+    {
+      "line_no": 38,
+      "text": "序号1:课程设计,25分。评审内容:培训模块划分合理性 / 课程大纲与采购需求对齐度 / 案例与互动设计 / 教材质量。完全合理得20-25分,较合理15-19分,一般10-14分,缺失或不合理0-9分。",
+      "length": 102,
+      "is_standalone": false,
+      "has_chapter_num": false,
+      "has_dots_leader": false
+    },
+    {
+      "line_no": 39,
+      "text": "序号2:师资配置,20分。评审内容:主讲教师资历 / 讲师团队结构 / 外聘专家档次 / 师资稳定性。团队齐全且履历优异得16-20分,较齐全得11-15分,一般6-10分,不符合0-5分。",
+      "length": 95,
+      "is_standalone": false,
+      "has_chapter_num": false,
+      "has_dots_leader": false
+    },
+    {
+      "line_no": 40,
+      "text": "序号3:实施方案,15分。评审内容:四阶段任务划分 / 时间进度 / 质量控制 / 应急预案。内容完整清晰得12-15分,较完整得8-11分,一般得4-7分,缺失0-3分。",
+      "length": 86,
+      "is_standalone": false,
+      "has_chapter_num": false,
+      "has_dots_leader": false
+    },
+    {
+      "line_no": 41,
+      "text": "序号4:保障措施,12分。评审内容:质量保证 / 进度保证 / 安全保证 / 保密保证 / 沟通保证 / 验收保证。有效合理、针对性强、可行性强得10-12分;较合理得6-9分;不合理0-5分。",
+      "length": 97,
+      "is_standalone": false,
+      "has_chapter_num": false,
+      "has_dots_leader": false
+    },
+    {
+      "line_no": 42,
+      "text": "序号5:服务承诺,8分。评审内容:响应时间 / 成果交付时间 / 售后服务。3 项均完整具体得7-8分,2 项得4-6分,1 项得1-3分,未提供0分。",
+      "length": 76,
+      "is_standalone": false,
+      "has_chapter_num": false,
+      "has_dots_leader": false
+    },
+    {
+      "line_no": 43,
+      "text": "第四章 政府采购合同",
+      "length": 10,
+      "is_standalone": true,
+      "has_chapter_num": true,
+      "has_dots_leader": false
+    },
+    {
+      "line_no": 44,
+      "text": "本章为合同模板,略。",
+      "length": 10,
+      "is_standalone": false,
+      "has_chapter_num": false,
+      "has_dots_leader": false
+    },
+    {
+      "line_no": 45,
+      "text": "第五章 采购需求",
+      "length": 8,
+      "is_standalone": true,
+      "has_chapter_num": true,
+      "has_dots_leader": false
+    },
+    {
+      "line_no": 46,
+      "text": "一、项目名称:A 市直属单位 2026 年度干部综合能力提升培训服务采购项目",
+      "length": 38,
+      "is_standalone": true,
+      "has_chapter_num": false,
+      "has_dots_leader": false
+    },
+    {
+      "line_no": 47,
+      "text": "二、项目编号:DEMO-2026-001",
+      "length": 20,
+      "is_standalone": true,
+      "has_chapter_num": false,
+      "has_dots_leader": false
+    },
+    {
+      "line_no": 48,
+      "text": "三、采购需求:为提升 A 市直属单位在职干部综合能力,采购人拟通过本项目采购一整套覆盖理论素养、业务能力、数字素养、作风建设四大模块的培训服务。要求供应商按模块设计课程、配置师资、分阶段实施、组织考核、汇编成果。培训对象约 200 人,分 4 期开展。",
+      "length": 126,
+      "is_standalone": false,
+      "has_chapter_num": false,
+      "has_dots_leader": false
+    },
+    {
+      "line_no": 49,
+      "text": "四、服务期限:合同签订后 60 日历日内完成全部培训与考核工作。",
+      "length": 32,
+      "is_standalone": false,
+      "has_chapter_num": false,
+      "has_dots_leader": false
+    },
+    {
+      "line_no": 50,
+      "text": "五、成果交付物:",
+      "length": 8,
+      "is_standalone": true,
+      "has_chapter_num": false,
+      "has_dots_leader": false
+    },
+    {
+      "line_no": 51,
+      "text": "1. 培训方案设计文档",
+      "length": 11,
+      "is_standalone": true,
+      "has_chapter_num": false,
+      "has_dots_leader": false
+    },
+    {
+      "line_no": 52,
+      "text": "2. 师资与课程大纲清单",
+      "length": 12,
+      "is_standalone": true,
+      "has_chapter_num": false,
+      "has_dots_leader": false
+    },
+    {
+      "line_no": 53,
+      "text": "3. 分阶段授课记录与视频资料",
+      "length": 15,
+      "is_standalone": true,
+      "has_chapter_num": false,
+      "has_dots_leader": false
+    },
+    {
+      "line_no": 54,
+      "text": "4. 学员考核成绩汇编",
+      "length": 11,
+      "is_standalone": true,
+      "has_chapter_num": false,
+      "has_dots_leader": false
+    },
+    {
+      "line_no": 55,
+      "text": "5. 结业报告",
+      "length": 7,
+      "is_standalone": true,
+      "has_chapter_num": false,
+      "has_dots_leader": false
+    },
+    {
+      "line_no": 56,
+      "text": "第六章 响应文件格式",
+      "length": 10,
+      "is_standalone": true,
+      "has_chapter_num": true,
+      "has_dots_leader": false
+    },
+    {
+      "line_no": 57,
+      "text": "目 录",
+      "length": 3,
+      "is_standalone": true,
+      "has_chapter_num": false,
+      "has_dots_leader": false
+    },
+    {
+      "line_no": 58,
+      "text": "一、投标文件封面",
+      "length": 8,
+      "is_standalone": true,
+      "has_chapter_num": false,
+      "has_dots_leader": false
+    },
+    {
+      "line_no": 59,
+      "text": "二、资格响应文件",
+      "length": 8,
+      "is_standalone": true,
+      "has_chapter_num": false,
+      "has_dots_leader": false
+    },
+    {
+      "line_no": 60,
+      "text": "(一)供应商资格声明",
+      "length": 10,
+      "is_standalone": true,
+      "has_chapter_num": false,
+      "has_dots_leader": false
+    },
+    {
+      "line_no": 61,
+      "text": "(二)法定代表人身份证明或授权书",
+      "length": 16,
+      "is_standalone": true,
+      "has_chapter_num": false,
+      "has_dots_leader": false
+    },
+    {
+      "line_no": 62,
+      "text": "(三)其他资格证明文件",
+      "length": 11,
+      "is_standalone": true,
+      "has_chapter_num": false,
+      "has_dots_leader": false
+    },
+    {
+      "line_no": 63,
+      "text": "(四)不参与围标串标承诺书",
+      "length": 13,
+      "is_standalone": true,
+      "has_chapter_num": false,
+      "has_dots_leader": false
+    },
+    {
+      "line_no": 64,
+      "text": "三、报价响应文件",
+      "length": 8,
+      "is_standalone": true,
+      "has_chapter_num": false,
+      "has_dots_leader": false
+    },
+    {
+      "line_no": 65,
+      "text": "(一)开标一览表",
+      "length": 8,
+      "is_standalone": true,
+      "has_chapter_num": false,
+      "has_dots_leader": false
+    },
+    {
+      "line_no": 66,
+      "text": "四、商务、技术响应文件",
+      "length": 11,
+      "is_standalone": true,
+      "has_chapter_num": false,
+      "has_dots_leader": false
+    },
+    {
+      "line_no": 67,
+      "text": "(一)磋商申请",
+      "length": 7,
+      "is_standalone": true,
+      "has_chapter_num": false,
+      "has_dots_leader": false
+    },
+    {
+      "line_no": 68,
+      "text": "(二)商务部分",
+      "length": 7,
+      "is_standalone": true,
+      "has_chapter_num": false,
+      "has_dots_leader": false
+    },
+    {
+      "line_no": 69,
+      "text": "(三)技术部分",
+      "length": 7,
+      "is_standalone": true,
+      "has_chapter_num": false,
+      "has_dots_leader": false
+    },
+    {
+      "line_no": 70,
+      "text": "一、投标文件封面",
+      "length": 8,
+      "is_standalone": true,
+      "has_chapter_num": false,
+      "has_dots_leader": false
+    },
+    {
+      "line_no": 71,
+      "text": "项目名称:________________",
+      "length": 21,
+      "is_standalone": true,
+      "has_chapter_num": false,
+      "has_dots_leader": false
+    },
+    {
+      "line_no": 72,
+      "text": "供应商(电子签章):________________",
+      "length": 26,
+      "is_standalone": true,
+      "has_chapter_num": false,
+      "has_dots_leader": false
+    },
+    {
+      "line_no": 73,
+      "text": "法定代表人(电子签名):________________",
+      "length": 28,
+      "is_standalone": true,
+      "has_chapter_num": false,
+      "has_dots_leader": false
+    },
+    {
+      "line_no": 74,
+      "text": "日期:____年__月__日",
+      "length": 14,
+      "is_standalone": true,
+      "has_chapter_num": false,
+      "has_dots_leader": false
+    },
+    {
+      "line_no": 75,
+      "text": "二、资格响应文件",
+      "length": 8,
+      "is_standalone": true,
+      "has_chapter_num": false,
+      "has_dots_leader": false
+    },
+    {
+      "line_no": 76,
+      "text": "(一)供应商资格声明",
+      "length": 10,
+      "is_standalone": true,
+      "has_chapter_num": false,
+      "has_dots_leader": false
+    },
+    {
+      "line_no": 77,
+      "text": "投标人名称:________________",
+      "length": 22,
+      "is_standalone": true,
+      "has_chapter_num": false,
+      "has_dots_leader": false
+    },
+    {
+      "line_no": 78,
+      "text": "营业执照注册号:________________",
+      "length": 24,
+      "is_standalone": true,
+      "has_chapter_num": false,
+      "has_dots_leader": false
+    },
+    {
+      "line_no": 79,
+      "text": "注册资金:________ 邮政编码:________",
+      "length": 27,
+      "is_standalone": true,
+      "has_chapter_num": false,
+      "has_dots_leader": false
+    },
+    {
+      "line_no": 80,
+      "text": "成立日期:____年__月__日",
+      "length": 16,
+      "is_standalone": true,
+      "has_chapter_num": false,
+      "has_dots_leader": false
+    },
+    {
+      "line_no": 81,
+      "text": "地址:________________",
+      "length": 19,
+      "is_standalone": true,
+      "has_chapter_num": false,
+      "has_dots_leader": false
+    },
+    {
+      "line_no": 82,
+      "text": "经营范围:________________",
+      "length": 21,
+      "is_standalone": true,
+      "has_chapter_num": false,
+      "has_dots_leader": false
+    },
+    {
+      "line_no": 83,
+      "text": "声明:本公司具备并满足《政府采购法》第二十二条的全部规定。",
+      "length": 29,
+      "is_standalone": false,
+      "has_chapter_num": false,
+      "has_dots_leader": false
+    },
+    {
+      "line_no": 84,
+      "text": "供应商(电子签章):____________ 日期:____年__月__日",
+      "length": 37,
+      "is_standalone": true,
+      "has_chapter_num": false,
+      "has_dots_leader": false
+    },
+    {
+      "line_no": 85,
+      "text": "(二)法定代表人身份证明或附有法定代表人身份证明的授权书",
+      "length": 28,
+      "is_standalone": true,
+      "has_chapter_num": false,
+      "has_dots_leader": false
+    },
+    {
+      "line_no": 86,
+      "text": "供应商名称:________________",
+      "length": 22,
+      "is_standalone": true,
+      "has_chapter_num": false,
+      "has_dots_leader": false
+    },
+    {
+      "line_no": 87,
+      "text": "姓名:______ 性别:______ 职务:______",
+      "length": 29,
+      "is_standalone": true,
+      "has_chapter_num": false,
+      "has_dots_leader": false
+    },
+    {
+      "line_no": 88,
+      "text": "系 ______________ 的法定代表人,特此证明。",
+      "length": 29,
+      "is_standalone": false,
+      "has_chapter_num": false,
+      "has_dots_leader": false
+    },
+    {
+      "line_no": 89,
+      "text": "供应商(电子签章):____________ 日期:____年__月__日",
+      "length": 37,
+      "is_standalone": true,
+      "has_chapter_num": false,
+      "has_dots_leader": false
+    },
+    {
+      "line_no": 90,
+      "text": "(三)其他资格证明文件",
+      "length": 11,
+      "is_standalone": true,
+      "has_chapter_num": false,
+      "has_dots_leader": false
+    },
+    {
+      "line_no": 91,
+      "text": "本处上传:营业执照 / 财务报告 / 税务证明 / 社保缴费证明等资格材料扫描件。",
+      "length": 41,
+      "is_standalone": false,
+      "has_chapter_num": false,
+      "has_dots_leader": false
+    },
+    {
+      "line_no": 92,
+      "text": "(四)不参与围标串标承诺书",
+      "length": 13,
+      "is_standalone": true,
+      "has_chapter_num": false,
+      "has_dots_leader": false
+    },
+    {
+      "line_no": 93,
+      "text": "本人作为 ______________ 的法人,承诺本项目投标活动不存在围标串标行为。",
+      "length": 43,
+      "is_standalone": false,
+      "has_chapter_num": false,
+      "has_dots_leader": false
+    },
+    {
+      "line_no": 94,
+      "text": "项目编号:DEMO-2026-001",
+      "length": 18,
+      "is_standalone": true,
+      "has_chapter_num": false,
+      "has_dots_leader": false
+    },
+    {
+      "line_no": 95,
+      "text": "供应商(电子签章):____________ 日期:____年__月__日",
+      "length": 37,
+      "is_standalone": true,
+      "has_chapter_num": false,
+      "has_dots_leader": false
+    },
+    {
+      "line_no": 96,
+      "text": "三、报价响应文件",
+      "length": 8,
+      "is_standalone": true,
+      "has_chapter_num": false,
+      "has_dots_leader": false
+    },
+    {
+      "line_no": 97,
+      "text": "(一)开标一览表",
+      "length": 8,
+      "is_standalone": true,
+      "has_chapter_num": false,
+      "has_dots_leader": false
+    },
+    {
+      "line_no": 98,
+      "text": "项目编号:DEMO-2026-001",
+      "length": 18,
+      "is_standalone": true,
+      "has_chapter_num": false,
+      "has_dots_leader": false
+    },
+    {
+      "line_no": 99,
+      "text": "项目名称:A 市直属单位 2026 年度干部综合能力提升培训服务采购项目",
+      "length": 36,
+      "is_standalone": true,
+      "has_chapter_num": false,
+      "has_dots_leader": false
+    },
+    {
+      "line_no": 100,
+      "text": "投标报价(小写):________ 元",
+      "length": 19,
+      "is_standalone": true,
+      "has_chapter_num": false,
+      "has_dots_leader": false
+    },
+    {
+      "line_no": 101,
+      "text": "投标报价(大写):________________",
+      "length": 25,
+      "is_standalone": true,
+      "has_chapter_num": false,
+      "has_dots_leader": false
+    },
+    {
+      "line_no": 102,
+      "text": "服务期限:60日历日",
+      "length": 10,
+      "is_standalone": true,
+      "has_chapter_num": false,
+      "has_dots_leader": false
+    },
+    {
+      "line_no": 103,
+      "text": "供应商(电子签章):____________ 日期:____年__月__日",
+      "length": 37,
+      "is_standalone": true,
+      "has_chapter_num": false,
+      "has_dots_leader": false
+    },
+    {
+      "line_no": 104,
+      "text": "四、商务、技术响应文件",
+      "length": 11,
+      "is_standalone": true,
+      "has_chapter_num": false,
+      "has_dots_leader": false
+    },
+    {
+      "line_no": 105,
+      "text": "(一)磋商申请",
+      "length": 7,
+      "is_standalone": true,
+      "has_chapter_num": false,
+      "has_dots_leader": false
+    },
+    {
+      "line_no": 106,
+      "text": "致:A 市机关事务服务中心",
+      "length": 13,
+      "is_standalone": true,
+      "has_chapter_num": false,
+      "has_dots_leader": false
+    },
+    {
+      "line_no": 107,
+      "text": "根据贵方项目编号 DEMO-2026-001 的磋商文件,我方正式提交响应文件。总报价为(大写)________________ 元人民币。我方指派 __________ 为项目负责人。",
+      "length": 93,
+      "is_standalone": false,
+      "has_chapter_num": false,
+      "has_dots_leader": false
+    },
+    {
+      "line_no": 108,
+      "text": "供应商(电子签章):____________ 日期:____年__月__日",
+      "length": 37,
+      "is_standalone": true,
+      "has_chapter_num": false,
+      "has_dots_leader": false
+    },
+    {
+      "line_no": 109,
+      "text": "(二)商务部分",
+      "length": 7,
+      "is_standalone": true,
+      "has_chapter_num": false,
+      "has_dots_leader": false
+    },
+    {
+      "line_no": 110,
+      "text": "1. 投标人近3年类似项目业绩清单(培训服务类):项目名称 / 采购人 / 服务内容 / 合同金额 / 实施时间",
+      "length": 56,
+      "is_standalone": true,
+      "has_chapter_num": false,
+      "has_dots_leader": false
+    },
+    {
+      "line_no": 111,
+      "text": "2. 团队成员名单与简历、资质证明,加盖投标人公章",
+      "length": 25,
+      "is_standalone": true,
+      "has_chapter_num": false,
+      "has_dots_leader": false
+    },
+    {
+      "line_no": 112,
+      "text": "(三)技术部分",
+      "length": 7,
+      "is_standalone": true,
+      "has_chapter_num": false,
+      "has_dots_leader": false
+    },
+    {
+      "line_no": 113,
+      "text": "(1)课程设计方案",
+      "length": 9,
+      "is_standalone": true,
+      "has_chapter_num": false,
+      "has_dots_leader": false
+    },
+    {
+      "line_no": 114,
+      "text": "(2)师资配置方案",
+      "length": 9,
+      "is_standalone": true,
+      "has_chapter_num": false,
+      "has_dots_leader": false
+    },
+    {
+      "line_no": 115,
+      "text": "(3)实施方案",
+      "length": 7,
+      "is_standalone": true,
+      "has_chapter_num": false,
+      "has_dots_leader": false
+    },
+    {
+      "line_no": 116,
+      "text": "(4)保障措施",
+      "length": 7,
+      "is_standalone": true,
+      "has_chapter_num": false,
+      "has_dots_leader": false
+    },
+    {
+      "line_no": 117,
+      "text": "(5)服务承诺",
+      "length": 7,
+      "is_standalone": true,
+      "has_chapter_num": false,
+      "has_dots_leader": false
+    },
+    {
+      "line_no": 118,
+      "text": "注:供应商自行编写(包括但不限于以上内容)。",
+      "length": 22,
+      "is_standalone": false,
+      "has_chapter_num": false,
+      "has_dots_leader": false
+    }
+  ],
+  "tables": [],
+  "section_anchors": [
+    {
+      "section": "评审办法",
+      "start_line": 33,
+      "end_line": 44,
+      "confidence": "high",
+      "is_embedded": false,
+      "embedded_in": null,
+      "evidence": "L33 第三章 评审方法 -> L43 序号5:服务承诺 结束"
+    },
+    {
+      "section": "采购需求",
+      "start_line": 45,
+      "end_line": 56,
+      "confidence": "high",
+      "is_embedded": false,
+      "embedded_in": null,
+      "evidence": "L45 第五章 采购需求 -> L55 结业报告"
+    },
+    {
+      "section": "供应商资格要求",
+      "start_line": 16,
+      "end_line": 24,
+      "confidence": "high",
+      "is_embedded": true,
+      "embedded_in": "第一章 磋商公告 > 二、申请人的资格要求",
+      "evidence": "L16 二、申请人的资格要求 -> L23 7. 参加政府采购活动..."
+    },
+    {
+      "section": "响应文件格式",
+      "start_line": 56,
+      "end_line": 119,
+      "confidence": "high",
+      "is_embedded": false,
+      "embedded_in": null,
+      "evidence": "L56 第六章 响应文件格式 -> L118 最后一行"
+    }
+  ],
+  "sections": {},
+  "extracted": {
+    "procurement_method": "竞争性磋商",
+    "budget": "500000元",
+    "cap_price": "500000元(最高限价)",
+    "duration": "合同签订后60日历日内完成全部培训与考核工作",
+    "delivery_location": "A 市机关事务服务中心指定培训基地,线上线下结合",
+    "project_name": "A 市直属单位 2026 年度干部综合能力提升培训服务采购项目",
+    "project_number": "DEMO-2026-001",
+    "buyer_name": "A 市机关事务服务中心",
+    "buyer_agency_name": "示范咨询有限责任公司",
+    "qualifications": [
+      "基本资格:满足《政府采购法》第二十二条",
+      "供应商为中小微企业或依法登记的社会培训机构",
+      "具有独立承担民事责任的能力(提供营业执照)",
+      "具有良好的商业信誉和健全的财务会计制度",
+      "具有承担本项目所必需的设备和专业技术能力",
+      "有依法缴纳税收和社会保障资金的良好记录",
+      "三年内无重大违法记录"
+    ],
+    "substantial_response_marks": [],
+    "project_type": "other",
+    "bidding_entity": "own_demo"
+  },
+  "source_meta": {
+    "source_format": "docx"
+  },
+  "part_list_candidates": [
+    {
+      "source": "chapter",
+      "text": "第六章 响应文件格式\n目 录\n一、投标文件封面\n二、资格响应文件\n(一)供应商资格声明\n(二)法定代表人身份证明或授权书\n(三)其他资格证明文件\n(四)不参与围标串标承诺书\n三、报价响应文件\n(一)开标一览表\n四、商务、技术响应文件\n(一)磋商申请\n(二)商务部分\n(三)技术部分\n一、投标文件封面\n项目名称:________________\n供应商(电子签章):________________\n法定代表人(电子签名):________________\n日期:____年__月__日\n二、资格响应文件\n(一)供应商资格声明\n投标人名称:________________\n营业执照注册号:________________\n注册资金:________ 邮政编码:________\n成立日期:____年__月__日\n地址:________________\n经营范围:________________\n声明:本公司具备并满足《政府采购法》第二十二条的全部规定。\n供应商(电子签章):____________ 日期:____年__月__日\n(二)法定代表人身份证明或附有法定代表人身份证明的授权书\n供应商名称:________________\n姓名:______ 性别:______ 职务:______\n系 ______________ 的法定代表人,特此证明。\n供应商(电子签章):____________ 日期:____年__月__日\n(三)其他资格证明文件\n本处上传:营业执照 / 财务报告 / 税务证明 / 社保缴费证明等资格材料扫描件。\n(四)不参与围标串标承诺书\n本人作为 ______________ 的法人,承诺本项目投标活动不存在围标串标行为。\n项目编号:DEMO-2026-001\n供应商(电子签章):____________ 日期:____年__月__日\n三、报价响应文件\n(一)开标一览表\n项目编号:DEMO-2026-001\n项目名称:A 市直属单位 2026 年度干部综合能力提升培训服务采购项目\n投标报价(小写):________ 元\n投标报价(大写):________________\n服务期限:60日历日\n供应商(电子签章):____________ 日期:____年__月__日\n四、商务、技术响应文件\n(一)磋商申请\n致:A 市机关事务服务中心\n根据贵方项目编号 DEMO-2026-001 的磋商文件,我方正式提交响应文件。总报价为(大写)________________ 元人民币。我方指派 __________ 为项目负责人。\n供应商(电子签章):____________ 日期:____年__月__日\n(二)商务部分\n1. 投标人近3年类似项目业绩清单(培训服务类):项目名称 / 采购人 / 服务内容 / 合同金额 / 实施时间\n2. 团队成员名单与简历、资质证明,加盖投标人公章\n(三)技术部分\n(1)课程设计方案\n(2)师资配置方案\n(3)实施方案\n(4)保障措施\n(5)服务承诺\n注:供应商自行编写(包括但不限于以上内容)。",
+      "start_line": 56,
+      "end_line": 119
+    }
+  ],
+  "score_items_raw_positions": [
+    {
+      "index": 1,
+      "name_hint": "投标报价",
+      "value_hint": "20分",
+      "start_line": 35,
+      "end_line": 37,
+      "raw_text": "一、价格部分(20 分)\n投标报价得分=(评标基准价／投标报价)×20 分。其中评标基准价为所有有效投标报价中的最低者。",
+      "part_attribution": "开标一览表"
+    },
+    {
+      "index": 2,
+      "name_hint": "课程设计",
+      "value_hint": "25分",
+      "start_line": 38,
+      "end_line": 39,
+      "raw_text": "序号1:课程设计,25分。评审内容:培训模块划分合理性 / 课程大纲与采购需求对齐度 / 案例与互动设计 / 教材质量。完全合理得20-25分,较合理15-19分,一般10-14分,缺失或不合理0-9分。",
+      "part_attribution": "技术部分"
+    },
+    {
+      "index": 3,
+      "name_hint": "师资配置",
+      "value_hint": "20分",
+      "start_line": 39,
+      "end_line": 40,
+      "raw_text": "序号2:师资配置,20分。评审内容:主讲教师资历 / 讲师团队结构 / 外聘专家档次 / 师资稳定性。团队齐全且履历优异得16-20分,较齐全得11-15分,一般6-10分,不符合0-5分。",
+      "part_attribution": "技术部分"
+    },
+    {
+      "index": 4,
+      "name_hint": "实施方案",
+      "value_hint": "15分",
+      "start_line": 40,
+      "end_line": 41,
+      "raw_text": "序号3:实施方案,15分。评审内容:四阶段任务划分 / 时间进度 / 质量控制 / 应急预案。内容完整清晰得12-15分,较完整得8-11分,一般得4-7分,缺失0-3分。",
+      "part_attribution": "技术部分"
+    },
+    {
+      "index": 5,
+      "name_hint": "保障措施",
+      "value_hint": "12分",
+      "start_line": 41,
+      "end_line": 42,
+      "raw_text": "序号4:保障措施,12分。评审内容:质量保证 / 进度保证 / 安全保证 / 保密保证 / 沟通保证 / 验收保证。有效合理、针对性强、可行性强得10-12分;较合理得6-9分;不合理0-5分。",
+      "part_attribution": "技术部分"
+    },
+    {
+      "index": 6,
+      "name_hint": "服务承诺",
+      "value_hint": "8分",
+      "start_line": 42,
+      "end_line": 43,
+      "raw_text": "序号5:服务承诺,8分。评审内容:响应时间 / 成果交付时间 / 售后服务。3 项均完整具体得7-8分,2 项得4-6分,1 项得1-3分,未提供0分。",
+      "part_attribution": "技术部分"
+    }
+  ],
+  "response_file_parts": [
+    {
+      "id": "part_01",
+      "name": "投标文件封面",
+      "order": 1,
+      "source_anchor": {
+        "type": "text",
+        "start_line": 70,
+        "end_line": 75,
+        "evidence": "L70 一、投标文件封面 -> L74 日期"
+      },
+      "production_mode": "C",
+      "sub_mode": "C-template",
+      "evidence_for_mode": "固定模板+项目名/供应商/法代/日期变量"
+    },
+    {
+      "id": "part_02",
+      "name": "供应商资格声明",
+      "order": 2,
+      "source_anchor": {
+        "type": "text",
+        "start_line": 76,
+        "end_line": 86,
+        "evidence": "L76 (一)供应商资格声明 -> L85 签章"
+      },
+      "production_mode": "C",
+      "sub_mode": "C-template",
+      "evidence_for_mode": "投标人基本信息表 + 声明段 + 签章"
+    },
+    {
+      "id": "part_03",
+      "name": "法定代表人身份证明或授权书",
+      "order": 3,
+      "source_anchor": {
+        "type": "text",
+        "start_line": 86,
+        "end_line": 91,
+        "evidence": "L86 (二)法代证明/授权书 -> L90 签章"
+      },
+      "production_mode": "C",
+      "sub_mode": "C-template",
+      "evidence_for_mode": "法代姓名/性别/职务 + 签章"
+    },
+    {
+      "id": "part_04",
+      "name": "其他资格证明文件",
+      "order": 4,
+      "source_anchor": {
+        "type": "text",
+        "start_line": 91,
+        "end_line": 93,
+        "evidence": "L91 (三)其他资格证明文件 + L92 材料清单"
+      },
+      "production_mode": "B",
+      "sub_mode": null,
+      "evidence_for_mode": "上传营业执照/财务报告/税务证明/社保等扫描件"
+    },
+    {
+      "id": "part_05",
+      "name": "不参与围标串标承诺书",
+      "order": 5,
+      "source_anchor": {
+        "type": "text",
+        "start_line": 93,
+        "end_line": 97,
+        "evidence": "L93 (四)围标承诺 -> L96 签章"
+      },
+      "production_mode": "C",
+      "sub_mode": "C-template",
+      "evidence_for_mode": "固定承诺 + 项目编号 + 签章"
+    },
+    {
+      "id": "part_06",
+      "name": "开标一览表",
+      "order": 6,
+      "source_anchor": {
+        "type": "text",
+        "start_line": 98,
+        "end_line": 105,
+        "evidence": "L98 (一)开标一览表 -> L104 签章"
+      },
+      "production_mode": "C",
+      "sub_mode": "C-template",
+      "evidence_for_mode": "固定报价表 + 项目编号/名称/报价/服务期变量"
+    },
+    {
+      "id": "part_07",
+      "name": "磋商申请",
+      "order": 7,
+      "source_anchor": {
+        "type": "text",
+        "start_line": 106,
+        "end_line": 110,
+        "evidence": "L106 (一)磋商申请 -> L109 签章"
+      },
+      "production_mode": "C",
+      "sub_mode": "C-template",
+      "evidence_for_mode": "固定承诺 + 总报价/负责人变量"
+    },
+    {
+      "id": "part_08",
+      "name": "商务部分",
+      "order": 8,
+      "source_anchor": {
+        "type": "text",
+        "start_line": 110,
+        "end_line": 113,
+        "evidence": "L110 (二)商务部分 -> 业绩清单+团队简历"
+      },
+      "production_mode": "B",
+      "sub_mode": null,
+      "evidence_for_mode": "业绩合同扫描件 + 团队简历证明材料"
+    },
+    {
+      "id": "part_09",
+      "name": "技术部分",
+      "order": 9,
+      "source_anchor": {
+        "type": "text",
+        "start_line": 113,
+        "end_line": 119,
+        "evidence": "L113 (三)技术部分 -> 5 个子项"
+      },
+      "production_mode": "A",
+      "sub_mode": null,
+      "evidence_for_mode": "AI 按骨架撰写,承载技术商务 80 分主要部分"
+    }
+  ]
+}

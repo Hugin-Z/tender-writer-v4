@@ -1,0 +1,17 @@
+{
+  "response_file_parts": [
+    {
+      "name": "前导技术",
+      "production_mode": "A"
+    },
+    {
+      "name": "挂档资料",
+      "production_mode": "C",
+      "sub_mode": "C-attachment"
+    },
+    {
+      "name": "尾部材料",
+      "production_mode": "B"
+    }
+  ]
+}

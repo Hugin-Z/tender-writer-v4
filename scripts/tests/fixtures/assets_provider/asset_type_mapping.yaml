@@ -1,0 +1,12 @@
+# test 用 asset_type → assets 类别 映射(与 references/ 区分,fixture 自包含)
+mappings:
+  资质证书: 公司资质
+  营业执照: 公司资质
+  团队简历: 团队简历
+  人员简历: 团队简历
+
+  # 粗粒度回退
+  资质: 公司资质
+  简历: 团队简历
+
+fallback: __placeholder__

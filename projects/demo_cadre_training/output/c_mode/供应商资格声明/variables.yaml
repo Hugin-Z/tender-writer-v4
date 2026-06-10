@@ -1,0 +1,52 @@
+template_name: 供应商资格声明
+part_index: 1
+part_name: 供应商资格声明
+source_lines:
+- 76
+- 86
+variables:
+- name: bidder_name
+  description: 投标人全称
+  source: companies
+  path: own_demo.name
+  required: true
+- name: business_license_no
+  description: 统一社会信用代码
+  source: companies
+  path: own_demo.business_license_no
+  required: true
+- name: registered_capital
+  description: 注册资金
+  source: companies
+  path: own_demo.registered_capital
+  required: true
+- name: postal_code
+  description: 邮编
+  source: companies
+  path: own_demo.postal_code
+  required: true
+- name: established_date
+  description: 成立日期
+  source: companies
+  path: own_demo.established_date
+  required: true
+- name: address
+  description: 注册地址
+  source: companies
+  path: own_demo.address
+  required: true
+- name: business_scope
+  description: 经营范围
+  source: manual
+  path: ''
+  required: true
+- name: bidder_name_2
+  description: 投标人全称
+  source: companies
+  path: own_demo.name
+  required: true
+- name: submit_date
+  description: 日期
+  source: manual
+  path: ''
+  required: true

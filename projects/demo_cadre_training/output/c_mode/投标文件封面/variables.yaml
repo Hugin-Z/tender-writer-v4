@@ -1,0 +1,22 @@
+template_name: 投标文件封面
+part_index: 0
+part_name: 投标文件封面
+source_lines:
+- 70
+- 75
+variables:
+- name: bidder_name
+  description: 投标人全称(电子签章)
+  source: companies
+  path: own_demo.name
+  required: true
+- name: legal_representative
+  description: 法代(电子签名)
+  source: companies
+  path: own_demo.legal_representative
+  required: true
+- name: submit_date
+  description: 提交日期
+  source: manual
+  path: ''
+  required: true

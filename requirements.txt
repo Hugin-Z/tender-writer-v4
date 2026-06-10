@@ -1,0 +1,13 @@
+# tender-writer skill 依赖清单
+# 所有依赖将被安装到 tender-writer/.venv/ 这个隔离的虚拟环境中,
+# 不会污染系统 Python 环境。
+
+pdfplumber>=0.10.0              # PDF 文本与表格解析(招标文件解析的核心)
+python-docx>=1.1.0              # docx 文档读写(读取 docx 格式招标文件、生成最终标书)
+opencc-python-reimplemented>=0.1.7   # 繁简中文转换兜底(处理招标文件中混入的繁体字)
+lxml>=4.9.0                     # python-docx 的底层依赖,处理 docx 内部 XML
+pypinyin>=0.50.0                # 中文公司名转拼音(add_company.py 生成简短易记的 company_id)
+docxtpl>=0.16                   # Word docx 模板填充(C 模式 Part 的变量渲染)
+PyYAML>=6.0                     # yaml 读写(C 模式 variables.yaml / companies.yaml)
+docxcompose>=1.4                # docx 文件合并(V45 整标合并器)
+openpyxl>=3.1.0                 # xlsx 写入(阶段 6 export_deliverables 把 csv 转 xlsx)
