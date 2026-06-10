@@ -243,6 +243,63 @@ def _render_c_reference_section(part: dict, instructions_path: Path) -> str:
     return '\n'.join(lines)
 
 
+def _post_merge_normalize(final_doc, fragments_info: list[dict]) -> dict:
+    """V4-skel.7 V4-7 结构占位: cross-doc 合并协调 hook, 当前 noop。
+
+    接入点: composer.append 全跑完后、composer.save 之前。
+    final_doc 是 composer 合并后的 master Document (尚未 save)。
+
+    实线 V4-7 实现层补:
+    - font_normalize: cross-doc 字体一致 (重应用 apply_default_styles 或更深)
+    - table_width_unify: 表格列宽统一 (V4-1a 单 doc 已 OK, 跨 doc 待协调)
+    - section_break: section 收敛 (docxcompose 默认每 fragment 一个 section)
+    - page_number_reset: 跨 fragment 页码连续 / restart
+
+    return 字典 4 维度均为 "noop" 字符串 (不用 True/False 防 R10 假"已协调")。
+    """
+    result = {
+        'fragments_count': len(fragments_info),
+        'font_normalize': 'noop',
+        'table_width_unify': 'noop',
+        'section_break': 'noop',
+        'page_number_reset': 'noop',
+    }
+    print(
+        f"[V4-7 占位] post_merge_normalize: {result}",
+        file=sys.stderr,
+    )
+    return result
+
+
+def _write_merge_normalize_log(pkg_dir: Path, normalize_result: dict,
+                                fragments_info: list[dict]) -> None:
+    """V4-skel.8 V4-7 占位: 写 merge_normalize.log sidecar 到 final_tender_package/。
+
+    内容 = _post_merge_normalize 返回的 result dict + per-fragment 元数据。
+    enum 值 "noop" 字符串 (Hugin Phase 1 裁定不用 True/False), 让 Hugin 看 log
+    直接知道是占位状态。
+
+    实线 V4-7 实现层后, 各维度会从 "noop" 变 "done" + 协调细节填进 fragment 段。
+    """
+    log_path = pkg_dir / 'merge_normalize.log'
+    lines = [
+        '# V4-7 结构占位 merge_normalize.log',
+        '# 当前所有协调维度均为 "noop", 实线 V4-7 实现层',
+        f'# fragments 数: {normalize_result["fragments_count"]}',
+        '',
+        '## 协调维度',
+        f'font_normalize:     {normalize_result["font_normalize"]}',
+        f'table_width_unify:  {normalize_result["table_width_unify"]}',
+        f'section_break:      {normalize_result["section_break"]}',
+        f'page_number_reset:  {normalize_result["page_number_reset"]}',
+        '',
+        '## per-fragment 元数据',
+    ]
+    for i, frag in enumerate(fragments_info):
+        lines.append(f'[{i}] title={frag["title"]!r} src={frag["src"]!r}')
+    log_path.write_text('\n'.join(lines) + '\n', encoding='utf-8')
+
+
 def main():
     parser = argparse.ArgumentParser(description='V45 整标合并器(V62)')
     parser.add_argument('--project', required=True, help='项目名')
@@ -398,7 +455,18 @@ def _main_body(args, project_dir):
         composer.append(Document(str(divider)))
         composer.append(Document(str(frag)))
 
+    # V4-skel.7 V4-7 结构占位: cross-doc 合并协调 hook, 当前 noop。
+    # 接入点 = composer.append 全跑完之后、composer.save 之前。
+    # fragments_info 收集 per-fragment 元数据 (title + src path) 供 C8 写 log。
+    fragments_info = [
+        {'title': t, 'src': str(p)} for t, p in fragment_paths
+    ]
+    normalize_result = _post_merge_normalize(master, fragments_info)
+
     composer.save(str(final_response_path))
+
+    # V4-skel.8 V4-7 占位: 写 merge_normalize.log sidecar
+    _write_merge_normalize_log(pkg_dir, normalize_result, fragments_info)
 
     # 写 operations_checklist.md
     ops_path = pkg_dir / 'operations_checklist.md'

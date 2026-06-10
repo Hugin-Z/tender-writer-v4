@@ -235,6 +235,91 @@ def _normalize_run_size(elem) -> int:
     return n
 
 
+def _paragraph_has_drawing(p_elem) -> bool:
+    """V4-skel.4 V4-1b 占位: 只读检测段落是否含 <w:drawing> (不修改 element)。
+
+    检测用 element 树 find, 仅扫 descendants 不操作 element。跟 V4-1b 实现层
+    _extract_inline_images (将做 OXML 拷贝 + media part 复制 + rId 重分配) 完全
+    不重叠 — 本 helper 是结构层只读 R10 监测, 让 missing_elements.yaml 知道
+    本 Part 有几个含图段落; 实线图片保真留 V4-1b 实现层。
+    """
+    return p_elem.find(f'.//{qn("w:drawing")}') is not None
+
+
+def _count_drawings_in(p_elem) -> int:
+    """V4-skel.4 V4-1b 占位: 只读统计段落内 <w:drawing> 数 (不修改)。
+
+    跟 _paragraph_has_drawing 同型纯只读。len(list(iter)) 是常见 lxml 模式,
+    无 element 重组 / 无 media 操作。
+    """
+    return len(list(p_elem.iter(qn('w:drawing'))))
+
+
+def _insert_image_placeholder_paragraph(doc, n_drawings: int, source_path):
+    """V4-skel.5 V4-1b 占位 (R10 最关键): 含图段落整段跳过, 在原位置插入显式
+    占位段, 替代被跳过的段落。
+
+    业务语义 (Hugin 业务现实): 资质/证书章节内, 含图段是证书扫描件 — 投标前
+    由用户人工放入原件 (V4-4 公章红线同源: 签章/原件是用户法律动作, 工具不
+    代劳)。占位段聚焦 "缺证书图, 投标前手放原件", 不强调 "丢了文字"
+    (含图段文字基本是图注, 真要文字 AI 自己组织, 强调字数会误导)。
+
+    不操作 <w:drawing> 剥离 / 不操作段落重组 / 不操作 media part —
+    踏一步就是 V4-1a 第二季入口。整段跳过 + 占位段是结构层 R10 红线。
+    """
+    text = (
+        f'[V4-1b 占位:此处缺 {n_drawings} 张证书图(源 {source_path}),'
+        f'V4-1b 未自动搬运,投标前请人工放入原件]'
+    )
+    p = doc.add_paragraph()  # python-docx add_paragraph 自动 insert sectPr 前
+    run = p.add_run(text)
+    run.italic = True
+
+
+def _scan_missing_elements(src_doc, source_asset_path: Path) -> dict:
+    """V4-skel.4 V4-1b 占位: 纯只读扫源 docx, 返回 missing_elements 字典。
+
+    扫描点 (全只读, 不剥 element / 不操作 media):
+    - 直接子 <w:p> 内含 <w:drawing> 计数 (drawings + 含图段数)
+    - 直接子 <w:tbl> 内 cell <w:p> 含 <w:drawing> 粗粒度计数 (cell-level 不展开)
+    - len(src_doc.sections) 代理 header/footer 存在性 (V4-1b 实现层精化)
+
+    返回 dict 结构对齐 missing_elements.yaml schema:
+        source_asset / images / tables_with_potential_images /
+        headers / footers / placeholders_inserted /
+        v4_1b_implementation_pending
+    """
+    src_body = src_doc.element.body
+    p_tag = qn('w:p')
+    tbl_tag = qn('w:tbl')
+
+    total_drawings = 0
+    image_paragraphs = 0
+    tables_with_images = 0
+    for child in src_body.iterchildren():
+        if child.tag == p_tag:
+            if _paragraph_has_drawing(child):
+                image_paragraphs += 1
+                total_drawings += _count_drawings_in(child)
+        elif child.tag == tbl_tag:
+            if any(_paragraph_has_drawing(p) for p in child.iter(p_tag)):
+                tables_with_images += 1
+
+    n_sections = len(src_doc.sections)
+    return {
+        'source_asset': str(source_asset_path),
+        'images': {
+            'total_drawings_skipped': total_drawings,
+            'image_paragraphs_skipped': image_paragraphs,
+        },
+        'tables_with_potential_images': tables_with_images,
+        'headers': n_sections,  # 粗粒度: section 数代理 header/footer 存在性
+        'footers': n_sections,
+        'placeholders_inserted': image_paragraphs,  # V4-skel.5 每个含图段都插一个占位段
+        'v4_1b_implementation_pending': True,
+    }
+
+
 def _apply_table_cell_size_to_runs(elem) -> int:
     """V4-1a.12 表格 cell 字号 per-run 真修: 给搬入 element 内 <w:tbl> 范围下
     所有 <w:r> 的 rPr 显式 set <w:sz> + <w:szCs> = DEFAULT_TABLE_SIZE_PT (12pt),
@@ -285,7 +370,8 @@ def _apply_table_cell_size_to_runs(elem) -> int:
     return n
 
 
-def _handle_asset_lookup(doc, spec: dict, provider, part_name: str):
+def _handle_asset_lookup(doc, spec: dict, provider, part_name: str,
+                         missing_acc: list | None = None):
     """asset_lookup: 走 AssetsProvider 接口。
 
     V3-1:把 lookup_priority / year_filter / asset_query.type 从 spec 传给
@@ -316,6 +402,22 @@ def _handle_asset_lookup(doc, spec: dict, provider, part_name: str):
     # 跨 part ref (tblStyle / pStyle / numId) 由 S2 的 _rebind_refs 处理。
     src_doc = _DocxDocument(str(resolved_path))
     src_body = src_doc.element.body
+    # V4-skel.4 V4-1b: 只读扫源 docx 含图段 / 表内含图 / sections 数, 累加给
+    # _main_body 末尾统一写 missing_elements.yaml。R10: stderr emit 占位喊话。
+    # 注: C4 仅监测 + 喊话, iter 循环不动 (含图段落仍走 V4-1a deepcopy, 带
+    # drawing 破引用进 master); C5 改 iter 含图 continue + 插占位段后才修
+    # 破引用。
+    if missing_acc is not None:
+        scan_result = _scan_missing_elements(src_doc, resolved_path)
+        missing_acc.append(scan_result)
+        print(
+            f"[V4-1b 占位] 注入 {resolved_path.name}: 跳过 "
+            f"{scan_result['images']['total_drawings_skipped']} 张图段落 / "
+            f"{scan_result['tables_with_potential_images']} 个表格可能含图 / "
+            f"{scan_result['headers']} 个 section header/footer, "
+            f"见 missing_elements.yaml",
+            file=sys.stderr,
+        )
     # V4-1a S2: 建源 → master 的 name-based styleId 映射 (per-asset 一次)
     style_map = _build_style_id_map(src_doc, doc)
     # 目标 body 末尾通常是 <w:sectPr> (section properties), 新 element 要
@@ -337,6 +439,13 @@ def _handle_asset_lookup(doc, spec: dict, provider, part_name: str):
             # 尾部空段污染 assembled.docx)
             texts = ''.join(t.text or '' for t in child.iter(qn('w:t')))
             if not texts.strip():
+                continue
+            # V4-skel.5 V4-1b: 含图段落整段跳过 + 插显式占位段
+            # (R10 最关键: 不 deepcopy 避免带 drawing 破引用进 master,
+            # 用占位段告诉用户"此处缺证书图, 投标前人工放原件")
+            if _paragraph_has_drawing(child):
+                n_drawings = _count_drawings_in(child)
+                _insert_image_placeholder_paragraph(doc, n_drawings, resolved_path)
                 continue
         elif child.tag == tbl_tag:
             # 表格无条件保留 (V4-1a 的核心保真目标)
@@ -409,12 +518,14 @@ def _handle_self_drafted(doc, spec: dict, part_name: str):
         _append_placeholder_body(doc, f"招标文件原文提示: {spec.get('source')}")
 
 
-def _dispatch(doc, spec: dict, provider, part_name: str):
+def _dispatch(doc, spec: dict, provider, part_name: str,
+              missing_acc: list | None = None):
     st = spec.get('source_type')
     if st == 'inline_template':
         _handle_inline_template(doc, spec, part_name)
     elif st == 'asset_lookup':
-        _handle_asset_lookup(doc, spec, provider, part_name)
+        _handle_asset_lookup(doc, spec, provider, part_name,
+                             missing_acc=missing_acc)
     elif st == 'self_drafted':
         _handle_self_drafted(doc, spec, part_name)
     else:
@@ -516,14 +627,24 @@ def _main_body(args, project_dir):
     run.font.size = Pt(16)
 
     stats = {'inline_template': 0, 'asset_lookup': 0, 'self_drafted': 0}
+    # V4-skel.4 V4-1b 占位: 累加每个 asset 的 missing_elements 扫描结果, 末尾统一写盘
+    missing_acc: list = []
     for i, spec in enumerate(assembly_order):
-        _dispatch(doc, spec, provider, part['name'])
+        _dispatch(doc, spec, provider, part['name'], missing_acc=missing_acc)
         st = spec.get('source_type')
         if st in stats:
             stats[st] += 1
 
     assembled_path = b_dir / 'assembled.docx'
     doc.save(str(assembled_path))
+
+    # V4-skel.4 V4-1b 占位: 写 missing_elements.yaml (跟 V4-4 attachments.yaml
+    # 同型 sidecar)。仅当有 asset_lookup 真扫到 asset 时才写 (missing_acc 非空)。
+    if missing_acc:
+        missing_elements_path = b_dir / 'missing_elements.yaml'
+        with open(missing_elements_path, 'w', encoding='utf-8') as f:
+            yaml.safe_dump({'assets': missing_acc}, f,
+                           allow_unicode=True, sort_keys=False)
 
     # .pending_marker 空文件
     marker_path = b_dir / '.pending_marker'
@@ -536,6 +657,8 @@ def _main_body(args, project_dir):
     print(f"  inline_template 段: {stats['inline_template']}")
     print(f"  asset_lookup 段:    {stats['asset_lookup']}")
     print(f"  self_drafted 段:    {stats['self_drafted']}")
+    if missing_acc:
+        print(f"[V4-1b 占位] missing_elements.yaml 已写 {len(missing_acc)} 个 asset 扫描结果")
     print()
     print("用户填充完成真实内容后,请手工删除 .pending_marker。")
     print("V45 整标合并器会检测 marker,列入 pending_manual_work.md。")
