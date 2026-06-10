@@ -54,6 +54,11 @@ assets/**/_raw/*
 # V3-1 例外:own_* 公司下 demo_ 标识 fixture 入库(供 b_mode_fill demo 验证),
 # 真实 partner_* / ref_* 公司的 _raw 仍受隐私保护
 !assets/**/own_*/_raw/*demo*.docx
+# V4 公开化例外:V4-1a 测试 anchor 1.docx + 生成器入库(脱敏合成 fixture,
+# 真实开发期用真实样本,公开仓换结构等价合成版,详见 commit "公开化脱敏")
+!assets/**/own_*/_raw/1.docx
+!assets/**/own_*/_raw/_generators/
+!assets/**/own_*/_raw/_generators/**
 
 # 素材摄入去重记录(运行时产物)
 assets/.ingest_history.json

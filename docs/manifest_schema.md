@@ -126,21 +126,21 @@ asset_query:
 
 `asset_query.rationale` 是 AI 在 B 模式 extract 阶段写 intermediate.json 时,**为什么选这条 inventory_match**(选材理由)。结构层在 V4-skel.2 加,实现层 V4-2b。
 
-V4-2b 目的:让 Hugin 拿到 manifest.yaml 后**不打开源 docx** 就能判 "AI 选得对不对"(V4-2a 只有 inventory_match 选了谁,看不出为什么选)。
+V4-2b 目的:让用户拿到 manifest.yaml 后**不打开源 docx** 就能判 "AI 选得对不对"(V4-2a 只有 inventory_match 选了谁,看不出为什么选)。
 
 **结构** — 单字段 `asset_query.rationale: str`(类型 str,**否**必填 / V4-skel.2 结构层占位):
 
 - AI 选材理由文本
 - 未填或值为 `"__PENDING_AI__"` 时 `b_mode_fill` 溯源行追加 `[V4-2b 占位] rationale 未填`
-- 不影响 `lookup` / `resolve` 控制流(rationale 不消费,只供 Hugin 回查)
+- 不影响 `lookup` / `resolve` 控制流(rationale 不消费,只供用户回查)
 
 **占位规则**(R10 红线,复用 V4-4 / V4-2a 同源 `__PENDING_USER__` / `__PENDING_AI__` 字面):
 
 - 字段缺失 / 值为 `"__PENDING_AI__"` → `b_mode_fill` 溯源行 emit `[V4-2b 占位] rationale 未填 (asset_query.rationale 缺失或 __PENDING_AI__), 实线 V4-2b 实现层补`
 - **R10 边界**:不静默放过,WPS 打开 assembled.docx 在溯源行可见 "[V4-2b 占位]" 字面
-- 已填(非占位)时 `b_mode_fill` 透传不消费(rationale 不影响 lookup,只供 Hugin 回查)
+- 已填(非占位)时 `b_mode_fill` 透传不消费(rationale 不影响 lookup,只供用户回查)
 
-**详略约定**:V4-2b 实现层填 — 详略 / 必含信息项 待 Hugin 跑真实标手感后定(`docs/v4_backlog.md §1 V4-2b` 观察点 B)。
+**详略约定**:V4-2b 实现层填 — 详略 / 必含信息项 待真实使用手感后定(`docs/v4_backlog.md §1 V4-2b` 观察点 B)。
 
 **示例**(rationale 已填):
 
