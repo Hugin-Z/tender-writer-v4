@@ -1,5 +1,45 @@
 # tender-writer 变更日志
 
+## V4-1 · 2026-05-29 B asset 表格 + 段落样式保真·V4-1a
+
+V4-1(B asset 完整保真)拆为 V4-1a(段落 OXML + 表格)+ V4-1b(图片/页眉页脚,押后)。本次完成 V4-1a:B 模式 asset 注入 assembled.docx 由「仅提取段落文本(`add_run(para.text)`)」升级为「OXML element 拷贝 + 跨 part ref name-based rebind」,表格 / 段落样式 / 字体保真。
+
+- 实现:遍历源 docx body 的 `<w:p>` / `<w:tbl>` element 整体 deepcopy 入 assembled.docx,表格(含 `tblGrid` 列宽)、段落级样式、run 级字体/加粗随 element 自带。跨 part ref 按 `w:name` 映射 rebind —— `tblStyle` / `pStyle` 的源 styleId(WPS 数字 id)映射到 master 同名标准样式(`Table Grid` / `Heading 2`),视觉零损失、不复制 style 定义、不处理 id 冲突。
+- `numId`(自动编号)注入时 strip + warning:依据 anchor 实测(段落字面无编号前缀 + 孤立单段 + master 无多级 decimal 可复用),strip 丢「1.1」装饰前缀但标题语义由 `pStyle` rebind 保留,warning 提示用户可手补编号字面。已知降级,非静默。
+- anchor(用户提供 / fixture-first):`assets/公司资质/own_demo/_raw/1.docx`,WPS 导出真实业绩证明表(脱敏,9×7 表格 + `numId`)。7 个测试 case 真验:列宽 7 个 dxa 值逐值对照(招牌目标)/ `tblStyle`+`pStyle` rebind 成功 / `numId` strip / Heading2 加粗经 `pStyle` 保留。
+- 公章:整个 tender-writer 不做(原则级红线,非待办)。签章是用户的法律动作(物理盖章 / 电子签章),工具不代为生成,投标时公章页由用户手工处理。详见 business_model §8 #N21。
+- V4-1b 待做项登记(不在本次):图片 / inline_shape 注入(media part 复制 + relationship 注册)、页眉页脚 / section 保真。扫描件保真待定。
+- 字体 fallback 修复(V4-1a.6/.7):deepcopy 搬入的表格 run 原仅靠主题字体(`rFonts` 只 `w:hint` 无字体名),注入 master 后中文 fallback 到 MS 明朝(L4 灾难复现)、西文走 theme Cambria。修法:注入 run 补显式 `rFonts`(中文宋体 / 西文 Times New Roman / cs Times New Roman,跟 master `apply_default_styles` 一致),断主题 fallback 路径;仅补「无字体名」的 run,源已显式指定字体的尊重不覆盖。
+- fixture 对齐 + 字号归化(V4-1a.8/.9):(1) 测试夹具 `_inject_anchor_to_tmp_doc` 原未调 `apply_default_styles`,致目检产物标题显 python-docx 默认 Heading2 蓝(`4F81BD`);生产路径本调了、标题实为黑。夹具补 `apply_default_styles` 对齐生产,消除目检假象。(2) 字号归化:剥源 run 级 `sz`/`szCs` 让字号回落 master Normal,统一注入内容字号;段间距/缩进(中文排版)、字体(V4-1a.6 显式宋体/Times New Roman)、加粗/斜体强调均保留不剥。
+- 表格字号固化到 master(V4-1a.10/.11):此前"表格比正文小一号(14→12pt)"约定只活在 `docx_builder.add_table` 的 per-run set,没固化到 style 系统 —— 注入表格(deepcopy 绕过 `add_table`)拿不到约定,V4-1a.9 剥 run 级 `sz` 后回落 docDefaults 11pt。修法:新增单一事实源常量 `DEFAULT_TABLE_SIZE_PT=12`,TableNormal style 加 `sz=24`(12pt)、`add_table` per-run set、`_body_size_to_table_size` 三处均派生自该常量。TableGrid basedOn TableNormal,注入表格 `sz` 被剥后回落 TableNormal 的 12pt(V4-1a.9 剥 `sz` 反成正确路径)。per-run set 保留为双层(避免改 `set_run_font` 接口的 ripple,值由单一常量保证一致,非 bug)。所有表格路径(`add_table` 生产 / 注入 / 手贴)字号统一 12pt。
+- 表格 cell 字号 per-run 真修(V4-1a.12/.13):V4-1a.10 给 master TableNormal style 加 `sz=24` 期望兜底表格字号,Hugin WPS 目检发现 cell 文字仍 14pt。实测根因 = OXML 字号继承优先级:cell 段落无 pStyle 隐式走 Normal(`sz=28=14pt`),段落 style 优先级高于表格 style(TableNormal `sz=24`),TableNormal 永远被覆盖,对 cell 文字无效(`add_table` 表格 12pt 实际靠 per-run set,非靠 TableNormal style)。修法:删 TableNormal `sz=24`(实测无效的死代码),按 `add_table` 同款给注入 cell 内 run per-run set `sz=24`+`szCs=24`(run-level rPr 是继承链最高层,XML 有则 WPS 必取,不赌继承)。`DEFAULT_TABLE_SIZE_PT` 常量保留为真单一事实源(被 `add_table` per-run + cell per-run 两条真实路径派生)。测试同步从"验设置写入"改为"验 cell run 最终字号生效"(case_10 验表内 run `sz=24`、case_9 验表外段落剥 `sz` 走 Normal 14pt),纠正 V4-1a.10 自检 PASS 但渲染不符的验证盲区。
+
+人工目检项(docx 保真自动化兜不住的视觉项,Phase 3 由用户打开注入产物核对):表格边框完整不变形 / 列宽视觉正确 / Heading2 标题样式 / 跨 WPS 渲染无字体 fallback / 单元格内多段落 + 中文换行。XML 断言验「结构/数值对」,视觉验「渲染对」,两者互补。
+
+本次零图片/页眉页脚/公章/provider 改动(V4-1a.10 显式扩 scope 改 master `docx_builder` 加 TableNormal sz 固化,乙裁定);`run_all.py` 14→15 PASS(新增 `test_b_mode_v4_1a` 10 case,含 V4-1a.7 字体 fix case_8 + V4-1a.9 字号归化 case_9 + V4-1a.10 表格字号固化 case_10);R10 scan 基线持平(2 处 pre-existing false positive,V4-1a 零新增)。
+
+---
+
+## V4-2 · 2026-05-29 B 智能匹配·V4-2a 链路打通
+
+V4-2(B 智能匹配)拆为 V4-2a(链路打通)+ V4-2b(元数据精化 + rationale)。本次完成 V4-2a:让 AI 在 B 模式 extract 阶段写 intermediate.json 时 awareness 库内候选 + 本 Part 关联评分项,据三件源选材,消除此前"库空仍盲写 asset_query"的行为。
+
+- 机制(裁定甲):脚本扫候选 + AI 选。新增 `CuratedLocalAssetsProvider.enumerate_inventory()` 扫 assets 文件系统产候选清单(仅 `category` / `company_id` / `filename` / `year`,不读 frontmatter);`b_mode_extract.cmd_extract_text` 产两个 sidecar(`scoring_matrix_excerpt.md` 本 Part 评分项关键词 + 证据材料 / `assets_inventory.json` 候选清单);`SKILL.md` 阶段 4-B 加 Step 3 选材约束,要求 AI 读三件源、`asset_query.inventory_match` 选真实候选。脚本只产候选清单,AI 做语义选择(沿 R10 + 决策 #5)。
+- 占位(裁定甲 / 复用 V4-4 范本):库内无匹配候选时 `inventory_match` 标占位(`__PENDING_USER__`),不盲写库内不存在的条目。字段定义在 `docs/manifest_schema.md`。
+- 边界:V4-2a 只扫文件系统可见信息,frontmatter 14 字段 0 消费;下游 `b_mode_fill` / `resolve` 已通,本次不动;设计意图是用户按目录结构丢文件进 `assets/` 即可用,零元数据负担。
+
+V4-2b 待做项登记(不在本次):`asset_query.rationale` 字段 + `selection_rationale` 产物(为什么选 / 可回查);frontmatter 元数据(`review_status` / 有效期 / 适用范围 / 颁证机构)参与匹配;`lookup_priority` 的 `name_match_first` + `review_status_first` 两档。
+
+R10 / PER 流程登记(本次 Phase 3 发现,非 V4-2a 引入):
+
+- `r10_consistency_check` 报 `plans/v4-3.md:28`(指向 handbook 未建的 `ISC.md`)与 `plans/v4-4.md:24`(描述 fixture 改名前的 FROM 名)2 处路径引用为违规。经判定二者均为 false positive 非真违规:plan 作为过程文档正确描述「指向未来文件」「改名来源」,路径不存在是预期且正确的。V4-2a 守 scope 不修(不加 allowlist 不动 plan)。
+- 待办 1:扫描器应以规则识别 `plans/` 内「未来文件 / 改名来源」类路径引用(合法 lookalike),而非逐条 allowlist;沿 V4-0.2「能规则识别的用规则、真个案才 allowlist」原则。
+- 待办 2:R10 scan 纳入 PER Phase 3 自检标准动作(V4-0 建了 `r10_consistency_check` 但未进 Phase 3 三件,V4-3/V4-4 Phase 3 均未跑、V4-4 已确认是疏漏);以后 Phase 3 自检含「跑 R10 scan + 基线持平或解释新增」。
+
+本次零下游改动(`b_mode_fill` / `resolve` 未碰)、零 frontmatter 消费、零其他 sub_mode 影响;14/14 测试 PASS(含 V4-2a 6 新 case)。
+
+---
+
 ## V4-4 · 2026-05-29 C-attachment 真实现
 
 C-attachment(扫描件附件,整份文件单独挂,不进主响应文件文本流)从挂档状态真实现:schema 层原已收值,本次把 migrate / extract / fill / merge / export 五个执行端的 NotImplementedError / skip 改为真实业务分支,端到端跑通。

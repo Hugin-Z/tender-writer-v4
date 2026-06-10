@@ -8,6 +8,17 @@
 # - 同文件自指允许, 用 self_ref_files
 #
 # pattern 支持 * 通配 (简单 glob, 非 regex)
+#
+# ──────────────────────────────────────────────────────────────────
+# V4-skel 期 FP 登记 (过渡桥)
+#
+# Hugin V4-skel Phase 1 裁定: 基线语义 = "allowlist 之外零违规", 已判定
+# FP 逐条登记, 不用 plans/* 全通配 (太粗会掩盖未来 plan 里写错的真路径).
+#
+# 根治见 docs/v4_backlog.md §4 候选项 #2 (R10 扫描器识别 plans/ 内
+# "未来文件 / 改名来源" 类路径引用, 合法 lookalike, V4 独立任务规则识别),
+# 届时本 allowlist 中 "G 类 V4-skel FP 桥" 应被规则替代移除。
+# ──────────────────────────────────────────────────────────────────
 
 paths:
   # 占位用法 / 文档示例性引用
@@ -31,6 +42,15 @@ paths:
   - 'projects/demo/*'                                        # scripts/tests/test_compliance_check.py:157 测试材料路径 (注意: 不是 demo_cadre_training)
   - 'projects/real_nonexistent/*'                            # scripts/tests/test_r10_consistency_check.py 故意构造不存在路径验证扫描器
   - 'docs/nonexistent_path.md'                               # 同上, 故意构造
+  # ── G 类 · V4-skel FP 桥 (V4-skel.1 起逐条登记, 根治见 v4_backlog 候选项 #2) ──
+  - 'scripts/tests/test_v4_skeleton_e2e.py'                  # future_file: plans/v4-structure-completion.md C10 待造文件 (V4-skel.10 落)
+  - 'scripts/tests/fixtures/v4_skeleton/*'                   # future_file: plans/v4-structure-completion.md C10 待造 fixture 目录
+  - 'scripts/b_mode_extract.cmd_extract_text'                # symbol_ref: plans/v4-structure-completion.md 引用 module.function 不是文件
+  - 'assets/公司资质/own_xxx/_raw/20250101_xxx.docx'         # example_path: plans/v4-structure-completion.md missing_elements.yaml 示例的 own_xxx 用户占位
+  - 'scripts/tests/_v4_1a_phase3_injected.docx'              # historical_plan: plans/v4-1a-fix-font.md + fix-normalize.md 引用 V4-1a 收口已手删的目检产物
+  - 'scripts/tests/_r10_report.md'                           # gitignored: docs/v4_backlog.md 引用 R10 报告自身, 物理存在但 .gitignored
+  - 'projects/tender-writer/ISC.md'                          # historical_plan: plans/v4-3.md:28 V4-2a Phase 3 ack 的 handbook 仓未建文件
+  - 'scripts/tests/fixtures/v45_merge/brief_c_attachment_skip.json'  # historical_plan: plans/v4-4.md:24 V4-2a Phase 3 ack 的 fixture rename FROM 名
 
 constants:
   # ── F 类 · 历史佐证字面 (commit 4 / 6a 引入, 保留作 "迁移记录") ──

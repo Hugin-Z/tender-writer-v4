@@ -206,6 +206,70 @@ class CuratedLocalAssetsProvider(AssetsProvider):
             return int(lo) <= y <= int(hi)
         return y == int(s)
 
+    # ─── enumerate (V4-2a) ───
+
+    def enumerate_inventory(self) -> list[dict]:
+        """V4-2a: 扫 assets_root 全树,返候选清单 list[dict] 供 AI 在 B 模式
+        extract 阶段 awareness 库内有什么。
+
+        只读文件系统可见信息(category=目录名 / company_id=目录名 /
+        filename / year=YYYYMMDD_ 前缀);不读 frontmatter 元数据
+        (14 字段留 V4-2b)。
+
+        参照 _scan_candidates 的扫库风格(_raw/ 下 docx + pdf,
+        YYYYMMDD_ 前缀提 year),改为遍历全部 category × company,
+        无 asset_type 过滤、无 year_filter、无多命中选择。
+
+        每条 dict 字段:
+            - V4-2a 已实: category, company_id, filename, year, path, kind
+            - V4-2b 结构占位 (V4-skel.1 加): review_status, valid_until,
+              issuer, applicable_scope — 全 None, 不读 frontmatter,
+              字段定义到位但值留 None, 实现 (从 curated `.md` 读 frontmatter)
+              是 V4-2b 实现层。这里的"占位"是 R10 红线:字段在则 AI 可见
+              schema,值 None 让 AI 知道"V4-2a 未消费, V4-2b 未实现",
+              防 AI 把 None 当真实空值用。
+
+        kind 沿 _make_ref 取值约定 (raw_docx / raw_pdf)。
+        path 为相对 assets_root 的 posix 字符串,便于跨平台。
+        """
+        import re
+        inventory: list[dict] = []
+        if not self.assets_root.exists():
+            return inventory
+        for category_dir in sorted(self.assets_root.iterdir()):
+            if not category_dir.is_dir():
+                continue
+            if category_dir.name.startswith('_') or category_dir.name.startswith('.'):
+                continue
+            for company_dir in sorted(category_dir.iterdir()):
+                if not company_dir.is_dir():
+                    continue
+                if company_dir.name.startswith('_') or company_dir.name.startswith('.'):
+                    continue
+                raw_dir = company_dir / "_raw"
+                if not raw_dir.exists():
+                    continue
+                for kind, glob in (("raw_docx", "*.docx"), ("raw_pdf", "*.pdf")):
+                    for f in sorted(raw_dir.glob(glob)):
+                        year = None
+                        m = re.match(r"^(\d{4})\d{2}\d{2}_", f.name)
+                        if m:
+                            year = int(m.group(1))
+                        inventory.append({
+                            "category": category_dir.name,
+                            "company_id": company_dir.name,
+                            "filename": f.name,
+                            "year": year,
+                            "path": f.relative_to(self.assets_root).as_posix(),
+                            "kind": kind,
+                            # V4-skel.1: V4-2b 结构占位 frontmatter 4 字段, 全 None
+                            "review_status": None,
+                            "valid_until": None,
+                            "issuer": None,
+                            "applicable_scope": None,
+                        })
+        return inventory
+
     # ─── lookup ───
 
     def lookup(self, asset_type: str, **kwargs) -> AssetRef:
@@ -270,7 +334,18 @@ class CuratedLocalAssetsProvider(AssetsProvider):
     def _sort_by_priority(
         candidates: list[AssetRef], lookup_priority: str,
     ) -> list[AssetRef]:
-        # 本期实现 latest_year_first;其他 priority 留 V4,fallback 到 latest_year_first
+        # V3-1 实现 latest_year_first;其他 priority 是 V4-skel.3 V4-2b 结构占位,
+        # 当前 fallback 到 latest_year_first 并 emit warning (R10 红线: 非默认档
+        # 命中不静默 fallback, 让 Hugin 知道"选了没生效")。
+        # 实线判据 (name_match_first / review_status_first 谁先) V4-2b 实现层填,
+        # 详见 docs/v4_backlog.md §1 V4-2b 观察点 C。
+        import sys as _sys
+        if lookup_priority != "latest_year_first":
+            print(
+                f"[V4-2b 占位] lookup_priority='{lookup_priority}' 是结构占位, "
+                f"当前 fallback latest_year_first (实线 V4-2b 实现层填)",
+                file=_sys.stderr,
+            )
         return sorted(
             candidates,
             key=lambda c: -(c.metadata.get("year") or 0),

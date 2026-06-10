@@ -1,0 +1,38 @@
+part_name: 其他资格证明文件
+production_mode: B
+source_anchor:
+  type: text
+  start_line: 91
+  end_line: 93
+  evidence: L91 (三)其他资格证明文件
+assembly_order:
+- section_id: (一)
+  section_title: 营业执照
+  asset_type: 营业执照
+  source_type: asset_lookup
+  source: 申请人资格要求 3:营业执照
+  items:
+  - 营业执照扫描件
+  format: 扫描件加盖投标人公章
+  asset_query:
+    type: 资质
+    name: 营业执照
+    inventory_match:
+      filename: 20250101_demo_business_license.docx
+      company_id: own_demo
+      year: 2025
+- section_id: (二)
+  section_title: 审计报告
+  asset_type: 财务报告
+  source_type: asset_lookup
+  source: 申请人资格要求 4:商业信誉
+  items:
+  - 2025 年度审计报告
+  format: 扫描件加盖投标人公章
+  asset_query:
+    type: 资质
+    name: 审计报告
+    inventory_match:
+      filename: 20250420_demo_audit_report.docx
+      company_id: own_demo
+      year: 2025
